@@ -64,6 +64,14 @@
   --transition-fast: 120ms ease;
   --transition-base: 200ms ease;
   --transition-slow: 300ms ease;
+
+  /* ── Performance scoring ───────────────────────────────── */
+  --perf-better:        #0d9488;   /* teal — city with lower per-capita waste */
+  --perf-better-bg:     #f0fdfa;
+  --perf-better-border: #99f6e4;
+  --perf-worse:         #dc2626;   /* red — city with higher per-capita waste */
+  --perf-worse-bg:      #fef2f2;
+  --perf-worse-border:  #fecaca;
 }
 
 

@@ -6,6 +6,7 @@ import Footer from './components/Layout/Footer'
 import Layout from './components/Layout/Layout'
 import SocialLayout from './components/Layout/SocialLayout'
 import Home from './pages/Home'
+import { CITIES, MOCK_DATA } from './data/cities'
 import styles from './App.module.css'
 
 export default function App() {
@@ -20,6 +21,9 @@ export default function App() {
       setCityB(CITIES.find(c => c !== cityA) || 'Oakland')
     }
   }, [theme])
+
+  const perCapitaA = MOCK_DATA[cityA]?.perCapita ?? null
+  const perCapitaB = cityB ? (MOCK_DATA[cityB]?.perCapita ?? null) : null
 
   return (
     <div className={styles.root}>
@@ -37,10 +41,10 @@ export default function App() {
             {/* Comparison panel wrapper — animates between single and two-column */}
             <div className={`${styles.panels} ${cityB ? styles.comparing : ''}`}>
               <div className={styles.panelA}>
-                <Home city={cityA} />
+                <Home city={cityA} vsPerCapita={perCapitaB} />
               </div>
               <div className={`${styles.panelB} ${cityB ? styles.panelBActive : ''}`}>
-                {cityB && <Home city={cityB} />}
+                {cityB && <Home city={cityB} vsPerCapita={perCapitaA} />}
               </div>
             </div>
           </Layout>

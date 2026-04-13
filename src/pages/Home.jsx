@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { User, Share2, Download } from 'lucide-react'
+import { Share2, Download } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrashCan } from '@fortawesome/pro-regular-svg-icons'
 import styles from './Home.module.css'
 import { MOCK_DATA } from '../data/cities'
 
@@ -26,6 +28,9 @@ function buildConicGradient(cats) {
   return `conic-gradient(${stops.join(', ')})`
 }
 
+// Stable mock YoY changes per category (computed once at module level, not in render)
+const YOY_CHANGES = [0.82, -1.43, 1.91, -0.67, 1.24]
+
 // Simulated quarterly bar heights (24 quarters = 2019 Q1 → 2024 Q4)
 const BAR_HEIGHTS = [
   68, 74, 71, 65,   // 2019
@@ -36,15 +41,30 @@ const BAR_HEIGHTS = [
   70, 68, 72, 69,   // 2024
 ]
 
-export default function Home({ city = 'Berkeley' }) {
+export default function Home({ city = 'Berkeley', vsPerCapita = null }) {
   const data = MOCK_DATA[city] || MOCK_DATA['Berkeley']
   const isImproving = data.yoy < 0
   const [activeTab,   setActiveTab]   = useState('disposed')
   const [activeTrend, setActiveTrend] = useState('quarterly')
   const [hoveredBar,  setHoveredBar]  = useState(null)
 
+  // Performance color: compare against the other city if in comparison mode
+  let perf = null
+  if (vsPerCapita !== null) {
+    perf = data.perCapita <= vsPerCapita ? 'better' : 'worse'
+  }
+
+  const accentColor = perf === 'better'
+    ? 'var(--perf-better)'
+    : perf === 'worse'
+    ? 'var(--perf-worse)'
+    : 'var(--brand-600)'
+
   return (
-    <div className={styles.page}>
+    <div
+      className={styles.page}
+      style={{ '--accent-color': accentColor }}
+    >
 
       {/* ── City header ────────────────────────────────── */}
       <div className={styles.cityHeader}>
@@ -55,20 +75,13 @@ export default function Home({ city = 'Berkeley' }) {
 
       {/* ── Per-capita hero ─────────────────────────────── */}
       <div className={styles.hero}>
-        <div className={styles.heroIconWrap}>
-          <User className={styles.heroIcon} strokeWidth={1.5} />
-        </div>
         <div className={styles.heroNum}>
+          <FontAwesomeIcon icon={faTrashCan} className={styles.heroIcon} />
           <span className={`${styles.heroValue} num`}>{data.perCapita}</span>
           <span className={styles.heroUnit}>lbs</span>
         </div>
         <p className={styles.heroLabel}>per person · per day</p>
-        <span
-          className={`${styles.heroBadge} num`}
-          style={{ color: isImproving ? 'var(--status-positive)' : 'var(--status-negative)' }}
-        >
-          {isImproving ? '↓' : '↑'} {Math.abs(data.yoy)}% from last year
-        </span>
+        <div className={styles.heroAccentBar} />
       </div>
 
       {/* ── Stat cards ─────────────────────────────────── */}
@@ -205,15 +218,15 @@ export default function Home({ city = 'Berkeley' }) {
           </div>
 
           <div className={styles.yoyList}>
-            {CATEGORIES.slice(0, 5).map(cat => {
-              const change = (Math.random() * 4 - 2).toFixed(2)
-              const pos = parseFloat(change) >= 0
+            {CATEGORIES.slice(0, 5).map((cat, i) => {
+              const change = YOY_CHANGES[i]
+              const pos = change >= 0
               return (
                 <div key={cat.name} className={styles.yoyRow}>
                   <span className={styles.yoySwatch} style={{ background: cat.color }} />
                   <span className={styles.yoyName}>{cat.name}</span>
                   <span className={`${styles.yoyChange} num`} style={{ color: pos ? 'var(--status-positive)' : 'var(--status-negative)' }}>
-                    {pos ? '+' : ''}{change}%
+                    {pos ? '+' : ''}{change.toFixed(2)}%
                   </span>
                 </div>
               )

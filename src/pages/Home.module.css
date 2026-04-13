@@ -19,7 +19,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--brand-600);
+  color: var(--accent-color);
 }
 
 .cityName {
@@ -41,30 +41,15 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-2);
-  background: var(--surface-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xl);
-  padding: var(--space-8) var(--space-6);
-  box-shadow: var(--shadow-sm);
+  padding: var(--space-6) var(--space-6) var(--space-4);
   text-align: center;
 }
 
-.heroIconWrap {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: var(--brand-50);
-  border: 1px solid var(--brand-100);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--brand-600);
-  margin-bottom: var(--space-2);
-}
-
 .heroIcon {
-  width: 26px;
-  height: 26px;
+  font-size: 42px;
+  color: var(--accent-color);
+  opacity: 0.7;
+  margin-right: var(--space-1);
 }
 
 .heroNum {
@@ -78,7 +63,7 @@
   font-size: clamp(52px, 7vw, 80px);
   font-weight: 800;
   letter-spacing: -3px;
-  color: var(--text-primary);
+  color: var(--accent-color);
   line-height: 1;
 }
 
@@ -97,13 +82,13 @@
   color: var(--text-muted);
 }
 
-.heroBadge {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  padding: 4px 12px;
+.heroAccentBar {
+  width: 40px;
+  height: 3px;
   border-radius: var(--radius-full);
-  background: rgba(0, 0, 0, 0.04);
-  margin-top: var(--space-1);
+  background: var(--accent-color);
+  opacity: 0.6;
+  margin-top: var(--space-2);
 }
 
 /* ─── Stat cards ────────────────────────────────────────── */
@@ -316,17 +301,16 @@
 
 .bar {
   flex: 1;
-  background: var(--brand-400);
+  background: var(--accent-color);
   border-radius: 3px 3px 0 0;
-  opacity: 0.75;
+  opacity: 0.45;
   cursor: pointer;
-  transition: opacity var(--transition-fast), background var(--transition-fast);
+  transition: opacity var(--transition-fast);
 }
 
 .bar:hover,
 .barHovered {
-  opacity: 1;
-  background: var(--brand-600);
+  opacity: 0.85;
 }
 
 .barAxisLine {
@@ -423,6 +407,6 @@
   }
 
   .heroValue {
-    font-size: clamp(40px, 10cqi, 64px);
+    font-size: clamp(38px, 9cqi, 60px);
   }
 }
