@@ -23,21 +23,36 @@ function ChevronDown() {
   )
 }
 
-function CityPicker({ value, onChange, side }) {
+/**
+ * CityPicker
+ *  value        — selected city string, or null for unset state
+ *  onChange     — (city: string | null) => void
+ *  side         — 'a' | 'b' — drives color tokens
+ *  placeholder  — text shown when value is null
+ *  excludeCity  — city name to hide from the option list (prevents self-compare)
+ */
+function CityPicker({ value, onChange, side, placeholder, excludeCity }) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const filtered = CITIES.filter(
-    c => c.toLowerCase().includes(query.toLowerCase()) && c !== value
-  )
+  const isSet = value !== null
+
+  const options = CITIES.filter(c => {
+    const matchesQuery = c.toLowerCase().includes(query.toLowerCase())
+    const notSelf = c !== value
+    const notExcluded = c !== excludeCity
+    return matchesQuery && notSelf && notExcluded
+  })
 
   return (
-    <div className={`${styles.cityPicker} ${styles[`cityPicker_${side}`]}`}>
+    <div className={`${styles.cityPicker} ${styles[`cityPicker_${side}`]} ${!isSet ? styles.cityPickerUnset : ''}`}>
       <button
         className={styles.cityPickerTrigger}
         onClick={() => setOpen(v => !v)}
       >
-        <SearchIcon />
-        <span className={styles.cityName}>{value}</span>
+        {isSet && <SearchIcon />}
+        <span className={`${styles.cityName} ${!isSet ? styles.cityNamePlaceholder : ''}`}>
+          {isSet ? value : placeholder}
+        </span>
         <ChevronDown />
       </button>
       {open && (
@@ -49,7 +64,7 @@ function CityPicker({ value, onChange, side }) {
             value={query}
             onChange={e => setQuery(e.target.value)}
           />
-          {filtered.map(c => (
+          {options.map(c => (
             <button
               key={c}
               className={styles.cityOption}
@@ -58,17 +73,19 @@ function CityPicker({ value, onChange, side }) {
               {c}
             </button>
           ))}
+          {options.length === 0 && (
+            <p className={styles.cityOptionEmpty}>No cities found</p>
+          )}
         </div>
       )}
     </div>
   )
 }
 
-export default function AppHeader({ cityA, cityB, onCityAChange, onCityBChange, onAddCompare }) {
+export default function AppHeader({ cityA, cityB, onCityAChange, onCityBChange }) {
   const { theme, setTheme, themes } = useTheme()
   const [designOpen, setDesignOpen] = useState(false)
   const activeTheme = themes.find(t => t.id === theme) || themes[0]
-  const comparing = cityB !== null
 
   return (
     <header className={styles.header}>
@@ -95,32 +112,35 @@ export default function AppHeader({ cityA, cityB, onCityAChange, onCityBChange, 
         <a href="/" className={`${styles.navLink} ${styles.navLinkActive}`}>Dashboard</a>
       </nav>
 
-      {/* City controls — single or comparison */}
+      {/* City controls — always two pickers, B starts as placeholder */}
       <div className={styles.compare}>
-        <CityPicker value={cityA} onChange={onCityAChange} side="a" />
+        <CityPicker
+          value={cityA}
+          onChange={onCityAChange}
+          side="a"
+          excludeCity={cityB}
+        />
 
-        {comparing ? (
-          /* Comparison mode: VS + city B picker + close */
-          <>
-            <span className={styles.vsChip}>VS</span>
-            <CityPicker value={cityB} onChange={onCityBChange} side="b" />
-            <button
-              className={styles.closeCompareBtn}
-              onClick={() => onCityBChange(null)}
-              title="Close comparison"
-            >
-              ✕
-            </button>
-          </>
-        ) : (
-          /* Single mode: prominent add-comparison button */
-          <button className={styles.addCompareBtn} onClick={onAddCompare}>
-            <svg width="11" height="11" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5z" />
-            </svg>
-            Compare
-          </button>
-        )}
+        {/* Delimiter — non-combative comparison indicator */}
+        <span className={`${styles.delimiter} ${cityB ? styles.delimiterActive : ''}`}>↔</span>
+
+        <CityPicker
+          value={cityB}
+          onChange={onCityBChange}
+          side="b"
+          placeholder="Choose a city"
+          excludeCity={cityA}
+        />
+
+        {/* Close button — always in DOM, fades in when cityB is set (no layout shift) */}
+        <button
+          className={`${styles.closeCompareBtn} ${cityB ? styles.closeCompareBtnVisible : ''}`}
+          onClick={() => onCityBChange(null)}
+          tabIndex={cityB ? 0 : -1}
+          aria-label="Clear comparison city"
+        >
+          ✕
+        </button>
       </div>
 
       {/* Right actions */}

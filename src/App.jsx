@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { useTheme } from './contexts/ThemeContext'
-import { CITIES } from './data/cities'
 import AppHeader from './components/Layout/AppHeader'
 import Footer from './components/Layout/Footer'
 import Layout from './components/Layout/Layout'
@@ -22,11 +21,6 @@ export default function App() {
     }
   }, [theme])
 
-  const handleAddCompare = () => {
-    const defaultB = CITIES.find(c => c !== cityA) || 'Oakland'
-    setCityB(defaultB)
-  }
-
   return (
     <div className={styles.root}>
       <AppHeader
@@ -34,7 +28,6 @@ export default function App() {
         cityB={cityB}
         onCityAChange={setCityA}
         onCityBChange={setCityB}
-        onAddCompare={handleAddCompare}
       />
       <div className={styles.body}>
         {theme === 'social' ? (

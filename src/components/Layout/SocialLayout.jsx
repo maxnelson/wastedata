@@ -86,7 +86,7 @@ export default function SocialLayout({ cityA, cityB }) {
     <div className={styles.comparison}>
       <CityPanel city={cityA} side="a" />
       <div className={styles.divider}>
-        <span className={styles.vsBadge}>VS</span>
+        <span className={styles.vsBadge}>↔</span>
       </div>
       <CityPanel city={cityB} side="b" />
     </div>

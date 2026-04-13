@@ -84,12 +84,22 @@
   gap: var(--space-3);
 }
 
-.vsChip {
-  font-size: var(--text-xs);
-  font-weight: 900;
+/* ─── Comparison delimiter ──────────────────────────────── */
+.delimiter {
+  font-size: 16px;
   color: var(--header-fg-muted);
-  letter-spacing: 0.12em;
   flex-shrink: 0;
+  opacity: 0.35;
+  transition: opacity var(--transition-base);
+  user-select: none;
+  /* Prevent the glyph from contributing to layout shift */
+  width: 20px;
+  text-align: center;
+}
+
+/* Once a city B is selected, the delimiter brightens */
+.delimiterActive {
+  opacity: 0.7;
 }
 
 /* ─── City picker ───────────────────────────────────────── */
@@ -112,6 +122,7 @@
   white-space: nowrap;
 }
 
+/* City A — always set, full color */
 .cityPicker_a .cityPickerTrigger {
   background: var(--city-a-bg);
   color: var(--city-a-accent);
@@ -122,6 +133,7 @@
   filter: brightness(0.95);
 }
 
+/* City B — set state */
 .cityPicker_b .cityPickerTrigger {
   background: var(--city-b-bg);
   color: var(--city-b-accent);
@@ -132,57 +144,29 @@
   filter: brightness(0.95);
 }
 
+/* City B — unset/placeholder state */
+.cityPicker_b.cityPickerUnset .cityPickerTrigger {
+  background: transparent;
+  border-style: dashed;
+  border-color: var(--header-border);
+  color: var(--header-fg-muted);
+  opacity: 0.75;
+}
+
+.cityPicker_b.cityPickerUnset .cityPickerTrigger:hover {
+  opacity: 1;
+  background: var(--header-hover-bg);
+  filter: none;
+}
+
 .cityName {
   min-width: 72px;
   text-align: left;
 }
 
-/* ─── Add comparison button (single-city mode) ─────────── */
-.addCompareBtn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  border-radius: var(--radius-full);
-  border: 1.5px dashed var(--header-border);
-  background: transparent;
-  font-size: var(--text-sm);
-  font-family: var(--font-sans);
-  font-weight: 600;
-  color: var(--header-fg-muted);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-  opacity: 0.75;
-}
-
-.addCompareBtn:hover {
-  opacity: 1;
-  border-style: solid;
-  color: var(--header-fg);
-  background: var(--header-hover-bg);
-}
-
-/* ─── Close comparison button ───────────────────────────── */
-.closeCompareBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: none;
-  background: var(--header-hover-bg);
-  font-size: 12px;
-  color: var(--header-fg-muted);
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all var(--transition-fast);
-}
-
-.closeCompareBtn:hover {
-  background: rgba(255, 255, 255, 0.18);
-  color: var(--header-fg);
+/* Placeholder text — lighter weight to hint it's not yet selected */
+.cityNamePlaceholder {
+  font-weight: 500;
 }
 
 /* Dropdown — always light surface regardless of header bg */
@@ -228,6 +212,43 @@
 
 .cityOption:hover {
   background: var(--gray-100);
+}
+
+.cityOptionEmpty {
+  padding: 10px 14px;
+  font-size: var(--text-sm);
+  color: var(--gray-400);
+  font-style: italic;
+}
+
+/* ─── Close comparison button ───────────────────────────── */
+/* Always in DOM — opacity transition avoids layout shift */
+.closeCompareBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  color: var(--header-fg-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+}
+
+.closeCompareBtnVisible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.closeCompareBtn:hover {
+  background: var(--header-hover-bg);
+  color: var(--header-fg);
 }
 
 /* ─── Right actions ─────────────────────────────────────── */
