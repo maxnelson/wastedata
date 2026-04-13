@@ -1,17 +1,18 @@
 import { useState } from 'react'
+import { User, Share2, Download } from 'lucide-react'
 import styles from './Home.module.css'
 import { MOCK_DATA } from '../data/cities'
 
 // Matches var(--cat-*) tokens in order, rendered as conic-gradient stops
 const CATEGORIES = [
-  { name: 'Organic',              pct: 42, color: '#52b788' },
-  { name: 'Paper & Cardboard',    pct: 24, color: '#4895ef' },
-  { name: 'Plastic',              pct: 12, color: '#f77f00' },
-  { name: 'Construction & Inerts',pct: 11, color: '#a07850' },
-  { name: 'Metal',                pct:  3, color: '#8b9fa8' },
-  { name: 'Mixed Residue',        pct:  3, color: '#6b7280' },
-  { name: 'Special Waste',        pct:  3, color: '#f4c430' },
-  { name: 'Glass',                pct:  2, color: '#06b6d4' },
+  { name: 'Organic',               pct: 42, color: '#52b788' },
+  { name: 'Paper & Cardboard',     pct: 24, color: '#4895ef' },
+  { name: 'Plastic',               pct: 12, color: '#f77f00' },
+  { name: 'Construction & Inerts', pct: 11, color: '#a07850' },
+  { name: 'Metal',                 pct:  3, color: '#8b9fa8' },
+  { name: 'Mixed Residue',         pct:  3, color: '#6b7280' },
+  { name: 'Special Waste',         pct:  3, color: '#f4c430' },
+  { name: 'Glass',                 pct:  2, color: '#06b6d4' },
 ]
 
 // Build conic-gradient stops from pct values
@@ -35,43 +36,39 @@ const BAR_HEIGHTS = [
   70, 68, 72, 69,   // 2024
 ]
 
-function ShareIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor">
-      <path d="M13 4.5a2.5 2.5 0 1 1 .702 1.737L6.97 9.604a2.518 2.518 0 0 1 0 .792l6.733 3.367a2.5 2.5 0 1 1-.671 1.341l-6.733-3.367a2.5 2.5 0 1 1 0-3.474l6.733-3.367A2.5 2.5 0 0 1 13 4.5z" />
-    </svg>
-  )
-}
-
-function DownloadIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor">
-      <path d="M10.75 2.75a.75.75 0 0 0-1.5 0v8.614L6.295 8.235a.75.75 0 1 0-1.09 1.03l4.25 4.5a.75.75 0 0 0 1.09 0l4.25-4.5a.75.75 0 0 0-1.09-1.03l-2.955 3.129V2.75z" />
-      <path d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" />
-    </svg>
-  )
-}
-
 export default function Home({ city = 'Berkeley' }) {
   const data = MOCK_DATA[city] || MOCK_DATA['Berkeley']
-  const [activeTab,    setActiveTab]    = useState('disposed')
-  const [activeTrend,  setActiveTrend]  = useState('quarterly')
-  const [hoveredBar,   setHoveredBar]   = useState(null)
+  const isImproving = data.yoy < 0
+  const [activeTab,   setActiveTab]   = useState('disposed')
+  const [activeTrend, setActiveTrend] = useState('quarterly')
+  const [hoveredBar,  setHoveredBar]  = useState(null)
 
   return (
     <div className={styles.page}>
 
       {/* ── City header ────────────────────────────────── */}
       <div className={styles.cityHeader}>
-        <div>
-          <p className={styles.breadcrumb}>{data.county} County</p>
-          <h1 className={styles.cityName}>{city}</h1>
-          <p className={styles.cityMeta}>Population {data.population}</p>
+        <p className={styles.breadcrumb}>{data.county} County</p>
+        <h1 className={styles.cityName}>{city}</h1>
+        <p className={styles.cityMeta}>Population {data.population}</p>
+      </div>
+
+      {/* ── Per-capita hero ─────────────────────────────── */}
+      <div className={styles.hero}>
+        <div className={styles.heroIconWrap}>
+          <User className={styles.heroIcon} strokeWidth={1.5} />
         </div>
-        <div className={styles.headerActions}>
-          <button className={styles.actionBtn}><ShareIcon /> Share</button>
-          <button className={styles.actionBtn}><DownloadIcon /> Export CSV</button>
+        <div className={styles.heroNum}>
+          <span className={`${styles.heroValue} num`}>{data.perCapita}</span>
+          <span className={styles.heroUnit}>lbs</span>
         </div>
+        <p className={styles.heroLabel}>per person · per day</p>
+        <span
+          className={`${styles.heroBadge} num`}
+          style={{ color: isImproving ? 'var(--status-positive)' : 'var(--status-negative)' }}
+        >
+          {isImproving ? '↓' : '↑'} {Math.abs(data.yoy)}% from last year
+        </span>
       </div>
 
       {/* ── Stat cards ─────────────────────────────────── */}
@@ -79,30 +76,41 @@ export default function Home({ city = 'Berkeley' }) {
         <div className={styles.statCard}>
           <p className={styles.statLabel}>Total Disposed</p>
           <div className={styles.statValueRow}>
-            <span className={`${styles.statValue} num`} style={{ color: 'var(--brand-700)' }}>{data.total.toLocaleString()}</span>
+            <span className={`${styles.statValue} num`} style={{ color: 'var(--brand-700)' }}>
+              {data.total.toLocaleString()}
+            </span>
             <span className={styles.statUnit}>tons</span>
           </div>
           <p className={styles.statSub}>Q1 2024</p>
         </div>
-        <div className={styles.statCard}>
-          <p className={styles.statLabel}>Per Capita</p>
-          <div className={styles.statValueRow}>
-            <span className={`${styles.statValue} num`} style={{ color: 'var(--cat-glass)' }}>{data.perCapita}</span>
-            <span className={styles.statUnit}>lbs/day</span>
-          </div>
-          <p className={styles.statSub}>per resident</p>
-        </div>
+
         <div className={styles.statCard}>
           <p className={styles.statLabel}>Landfill Share</p>
           <div className={styles.statValueRow}>
-            <span className={`${styles.statValue} num`} style={{ color: 'var(--cat-plastic)' }}>94%</span>
+            <span className={`${styles.statValue} num`} style={{ color: 'var(--cat-plastic)' }}>
+              94%
+            </span>
           </div>
-          <p className={styles.statSub}>of total stream</p>
+          <p className={styles.statSub}>of disposed stream</p>
         </div>
+
         <div className={styles.statCard}>
-          <p className={styles.statLabel}>YoY Change</p>
+          <p className={styles.statLabel}>Diversion Rate</p>
           <div className={styles.statValueRow}>
-            <span className={`${styles.statValue} num`} style={{ color: data.yoy < 0 ? 'var(--status-positive)' : 'var(--status-negative)' }}>
+            <span className={`${styles.statValue} num`} style={{ color: 'var(--cat-organic)' }}>
+              41%
+            </span>
+          </div>
+          <p className={styles.statSub}>recycled or composted</p>
+        </div>
+
+        <div className={styles.statCard}>
+          <p className={styles.statLabel}>Year-over-Year</p>
+          <div className={styles.statValueRow}>
+            <span
+              className={`${styles.statValue} num`}
+              style={{ color: isImproving ? 'var(--status-positive)' : 'var(--status-negative)' }}
+            >
               {data.yoy > 0 ? '+' : ''}{data.yoy}%
             </span>
           </div>
@@ -196,7 +204,6 @@ export default function Home({ city = 'Berkeley' }) {
             </div>
           </div>
 
-          {/* Year-over-year change list */}
           <div className={styles.yoyList}>
             {CATEGORIES.slice(0, 5).map(cat => {
               const change = (Math.random() * 4 - 2).toFixed(2)
@@ -215,6 +222,19 @@ export default function Home({ city = 'Berkeley' }) {
         </div>
 
       </div>
+
+      {/* ── Page actions — intentionally at the bottom ──── */}
+      <div className={styles.pageActions}>
+        <button className={styles.actionBtn}>
+          <Share2 size={13} />
+          Share
+        </button>
+        <button className={styles.actionBtn}>
+          <Download size={13} />
+          Export CSV
+        </button>
+      </div>
+
     </div>
   )
 }

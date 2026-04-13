@@ -1,15 +1,15 @@
 .body {
   display: flex;
   flex: 1;
-  min-height: 0;
-  overflow: hidden;
+  min-height: 0; /* allow children to shrink — required for scroll chain */
+  /* NO overflow: hidden — .panels inside is the scroll container */
 }
 
-/* Content area is a flex passthrough — panels inside handle their own scroll */
 .content {
   flex: 1;
   display: flex;
   min-width: 0;
-  overflow: hidden;
+  min-height: 0;
   margin-left: var(--sidebar-width);
+  /* NO overflow: hidden — pass scroll through to .panels */
 }

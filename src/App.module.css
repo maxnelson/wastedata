@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow: hidden;
+  overflow: hidden; /* single outer boundary — nothing leaks past 100vh */
 }
 
 .body {
@@ -10,27 +10,29 @@
   padding-top: var(--header-height);
   padding-bottom: var(--footer-height);
   display: flex;
-  min-height: 0;
-  overflow: hidden;
+  min-height: 0; /* allow flex children to shrink below content height */
+  /* NO overflow: hidden here — we need the scroll chain to reach .panels */
 }
 
 /* ─── Comparison panel container ─────────────────────────
-   Lives inside Layout's .content area.
-   panelA has flex: 1 so it always fills remaining width.
-   panelB animates from width: 0 → 50% — as it expands,
-   panelA naturally compresses from the right side.
+   This is the single scroll container for both city panels.
+   align-items: flex-start lets each panel grow to its own
+   natural content height (no forced equal-height stretching).
+   Both panels scroll together because they share this container.
    ─────────────────────────────────────────────────────── */
 .panels {
   display: flex;
   flex: 1;
-  overflow: hidden;
+  min-height: 0;
+  overflow-y: auto;    /* ← one scroll bar for the whole comparison */
+  overflow-x: hidden;
+  align-items: flex-start; /* panels grow to natural height, not viewport height */
 }
 
 .panelA {
   flex: 1;
   min-width: 0;
-  overflow-y: auto;
-  /* Named container so Home.module.css container queries work */
+  /* NO overflow-y here — parent .panels owns scrolling */
   container-type: inline-size;
   container-name: cityPanel;
 }
@@ -38,10 +40,9 @@
 .panelB {
   flex-shrink: 0;
   width: 0;
-  overflow: hidden;
+  overflow: hidden; /* clips horizontal spill during width animation */
   opacity: 0;
   border-left: 1px solid var(--border-subtle);
-  /* Slide in: width expands first, then content fades */
   transition:
     width 380ms cubic-bezier(0.4, 0, 0.2, 1),
     opacity 220ms ease;
@@ -52,13 +53,7 @@
 .panelBActive {
   width: 50%;
   opacity: 1;
-  /* Slide out reverses: content fades first, then width collapses */
   transition:
     width 380ms cubic-bezier(0.4, 0, 0.2, 1),
     opacity 220ms ease 120ms;
-}
-
-/* Thin vertical VS divider — appears only when comparing */
-.comparing .panelA {
-  border-right: none; /* border is on panelB's left side */
 }
