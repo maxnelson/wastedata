@@ -64,10 +64,11 @@ function CityPicker({ value, onChange, side }) {
   )
 }
 
-export default function AppHeader({ cityA, cityB, onCityAChange, onCityBChange }) {
+export default function AppHeader({ cityA, cityB, onCityAChange, onCityBChange, onAddCompare }) {
   const { theme, setTheme, themes } = useTheme()
   const [designOpen, setDesignOpen] = useState(false)
   const activeTheme = themes.find(t => t.id === theme) || themes[0]
+  const comparing = cityB !== null
 
   return (
     <header className={styles.header}>
@@ -94,11 +95,32 @@ export default function AppHeader({ cityA, cityB, onCityAChange, onCityBChange }
         <a href="/" className={`${styles.navLink} ${styles.navLinkActive}`}>Dashboard</a>
       </nav>
 
-      {/* City comparison pickers — always visible */}
+      {/* City controls — single or comparison */}
       <div className={styles.compare}>
         <CityPicker value={cityA} onChange={onCityAChange} side="a" />
-        <span className={styles.vsChip}>VS</span>
-        <CityPicker value={cityB} onChange={onCityBChange} side="b" />
+
+        {comparing ? (
+          /* Comparison mode: VS + city B picker + close */
+          <>
+            <span className={styles.vsChip}>VS</span>
+            <CityPicker value={cityB} onChange={onCityBChange} side="b" />
+            <button
+              className={styles.closeCompareBtn}
+              onClick={() => onCityBChange(null)}
+              title="Close comparison"
+            >
+              ✕
+            </button>
+          </>
+        ) : (
+          /* Single mode: prominent add-comparison button */
+          <button className={styles.addCompareBtn} onClick={onAddCompare}>
+            <svg width="11" height="11" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5z" />
+            </svg>
+            Compare
+          </button>
+        )}
       </div>
 
       {/* Right actions */}

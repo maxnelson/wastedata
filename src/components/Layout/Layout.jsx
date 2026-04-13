@@ -6,7 +6,7 @@ export default function Layout({ children }) {
     <div className={styles.body}>
       <Sidebar />
       <div className={styles.content}>
-        <main className={styles.main}>{children}</main>
+        {children}
       </div>
     </div>
   )

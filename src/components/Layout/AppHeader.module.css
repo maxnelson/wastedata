@@ -133,8 +133,56 @@
 }
 
 .cityName {
-  min-width: 80px;
+  min-width: 72px;
   text-align: left;
+}
+
+/* ─── Add comparison button (single-city mode) ─────────── */
+.addCompareBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: var(--radius-full);
+  border: 1.5px dashed var(--header-border);
+  background: transparent;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--header-fg-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  opacity: 0.75;
+}
+
+.addCompareBtn:hover {
+  opacity: 1;
+  border-style: solid;
+  color: var(--header-fg);
+  background: var(--header-hover-bg);
+}
+
+/* ─── Close comparison button ───────────────────────────── */
+.closeCompareBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: var(--header-hover-bg);
+  font-size: 12px;
+  color: var(--header-fg-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.closeCompareBtn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--header-fg);
 }
 
 /* Dropdown — always light surface regardless of header bg */

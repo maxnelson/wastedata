@@ -1,12 +1,6 @@
 import { useState } from 'react'
 import styles from './Home.module.css'
-
-const STATS = [
-  { label: 'Total Disposed',  value: '48,234', unit: 'tons',    sub: 'Q1 2024',       color: 'var(--brand-700)' },
-  { label: 'Per Capita',      value: '3.4',    unit: 'lbs/day', sub: 'per resident',  color: 'var(--cat-glass)' },
-  { label: 'Landfill Share',  value: '94%',    unit: '',        sub: 'of total stream', color: 'var(--cat-plastic)' },
-  { label: 'YoY Change',      value: '−2.1%',  unit: '',        sub: 'vs Q1 2023',    color: 'var(--status-positive)', positive: true },
-]
+import { MOCK_DATA } from '../data/cities'
 
 // Matches var(--cat-*) tokens in order, rendered as conic-gradient stops
 const CATEGORIES = [
@@ -58,7 +52,8 @@ function DownloadIcon() {
   )
 }
 
-export default function Home() {
+export default function Home({ city = 'Berkeley' }) {
+  const data = MOCK_DATA[city] || MOCK_DATA['Berkeley']
   const [activeTab,    setActiveTab]    = useState('disposed')
   const [activeTrend,  setActiveTrend]  = useState('quarterly')
   const [hoveredBar,   setHoveredBar]   = useState(null)
@@ -69,29 +64,50 @@ export default function Home() {
       {/* ── City header ────────────────────────────────── */}
       <div className={styles.cityHeader}>
         <div>
-          <p className={styles.breadcrumb}>Alameda County</p>
-          <h1 className={styles.cityName}>Berkeley</h1>
-          <p className={styles.cityMeta}>Population 124,321 · Incorporated 1878</p>
+          <p className={styles.breadcrumb}>{data.county} County</p>
+          <h1 className={styles.cityName}>{city}</h1>
+          <p className={styles.cityMeta}>Population {data.population}</p>
         </div>
         <div className={styles.headerActions}>
           <button className={styles.actionBtn}><ShareIcon /> Share</button>
           <button className={styles.actionBtn}><DownloadIcon /> Export CSV</button>
-          <button className={styles.compareBtn}>Compare cities →</button>
         </div>
       </div>
 
       {/* ── Stat cards ─────────────────────────────────── */}
       <div className={styles.statsRow}>
-        {STATS.map(s => (
-          <div key={s.label} className={styles.statCard}>
-            <p className={styles.statLabel}>{s.label}</p>
-            <div className={styles.statValueRow}>
-              <span className={`${styles.statValue} num`} style={{ color: s.color }}>{s.value}</span>
-              {s.unit && <span className={styles.statUnit}>{s.unit}</span>}
-            </div>
-            <p className={styles.statSub}>{s.sub}</p>
+        <div className={styles.statCard}>
+          <p className={styles.statLabel}>Total Disposed</p>
+          <div className={styles.statValueRow}>
+            <span className={`${styles.statValue} num`} style={{ color: 'var(--brand-700)' }}>{data.total.toLocaleString()}</span>
+            <span className={styles.statUnit}>tons</span>
           </div>
-        ))}
+          <p className={styles.statSub}>Q1 2024</p>
+        </div>
+        <div className={styles.statCard}>
+          <p className={styles.statLabel}>Per Capita</p>
+          <div className={styles.statValueRow}>
+            <span className={`${styles.statValue} num`} style={{ color: 'var(--cat-glass)' }}>{data.perCapita}</span>
+            <span className={styles.statUnit}>lbs/day</span>
+          </div>
+          <p className={styles.statSub}>per resident</p>
+        </div>
+        <div className={styles.statCard}>
+          <p className={styles.statLabel}>Landfill Share</p>
+          <div className={styles.statValueRow}>
+            <span className={`${styles.statValue} num`} style={{ color: 'var(--cat-plastic)' }}>94%</span>
+          </div>
+          <p className={styles.statSub}>of total stream</p>
+        </div>
+        <div className={styles.statCard}>
+          <p className={styles.statLabel}>YoY Change</p>
+          <div className={styles.statValueRow}>
+            <span className={`${styles.statValue} num`} style={{ color: data.yoy < 0 ? 'var(--status-positive)' : 'var(--status-negative)' }}>
+              {data.yoy > 0 ? '+' : ''}{data.yoy}%
+            </span>
+          </div>
+          <p className={styles.statSub}>vs Q1 2023</p>
+        </div>
       </div>
 
       {/* ── Charts ─────────────────────────────────────── */}
@@ -123,7 +139,7 @@ export default function Home() {
               style={{ background: buildConicGradient(CATEGORIES) }}
             />
             <div className={styles.donutCenter}>
-              <span className={`${styles.donutValue} num`}>48,234</span>
+              <span className={`${styles.donutValue} num`}>{data.total.toLocaleString()}</span>
               <span className={styles.donutUnit}>tons disposed</span>
             </div>
           </div>
