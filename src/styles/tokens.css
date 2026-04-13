@@ -57,6 +57,7 @@
 
   /* ── Layout ────────────────────────────────────────────── */
   --header-height: 56px;
+  --footer-height: 44px;
   --sidebar-width: 256px;
 
   /* ── Transitions ───────────────────────────────────────── */
@@ -115,6 +116,22 @@
   /* Status */
   --status-positive: #22c55e;
   --status-negative: #ef4444;
+
+  /* Header-adaptive colors (dark header) */
+  --header-fg:        var(--text-on-dark);
+  --header-fg-muted:  var(--text-on-dark-muted);
+  --header-hover-bg:  rgba(255, 255, 255, 0.08);
+  --header-active-bg: rgba(255, 255, 255, 0.1);
+  --header-border:    rgba(255, 255, 255, 0.15);
+  --header-accent:    var(--brand-400);
+
+  /* City comparison accents — subtle tints on dark header */
+  --city-a-accent: var(--brand-400);
+  --city-a-bg:     rgba(116, 198, 157, 0.18);
+  --city-a-border: rgba(116, 198, 157, 0.38);
+  --city-b-accent: #93c5fd;
+  --city-b-bg:     rgba(147, 197, 253, 0.15);
+  --city-b-border: rgba(147, 197, 253, 0.35);
 }
 
 
@@ -169,7 +186,15 @@
   --status-positive: #16a34a;
   --status-negative: #dc2626;
 
-  /* Social-specific: city panel accent colors */
+  /* Header-adaptive colors (light header) */
+  --header-fg:        var(--text-primary);
+  --header-fg-muted:  var(--text-secondary);
+  --header-hover-bg:  var(--gray-100);
+  --header-active-bg: var(--gray-100);
+  --header-border:    var(--border-strong);
+  --header-accent:    var(--brand-500);
+
+  /* City comparison accents — vivid on white header */
   --city-a-accent:  #15803d;
   --city-a-muted:   #86efac;
   --city-a-bg:      #f0fdf4;

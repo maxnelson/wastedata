@@ -130,14 +130,6 @@ export default function Sidebar() {
 
       </div>
 
-      {/* ── Sidebar footer ──────────────────────────────── */}
-      <div className={styles.sidebarFooter}>
-        <a href="#" className={styles.footerLink}>About</a>
-        <span className={styles.footerDot} />
-        <a href="https://www2.calrecycle.ca.gov" className={styles.footerLink} target="_blank" rel="noreferrer">CalRecycle</a>
-        <span className={styles.footerDot} />
-        <a href="#" className={styles.footerLink}>GitHub</a>
-      </div>
     </aside>
   )
 }

@@ -1,0 +1,308 @@
+/* ─── Header shell ──────────────────────────────────────── */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  background: var(--surface-header);
+  border-bottom: 1px solid var(--header-border);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-6);
+  gap: var(--space-5);
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ─── Logo ──────────────────────────────────────────────── */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.logoMark {
+  width: 22px;
+  height: 22px;
+  color: var(--header-accent);
+  flex-shrink: 0;
+}
+
+.logoName {
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--header-fg);
+  letter-spacing: -0.4px;
+}
+
+.logoRegion {
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--header-fg-muted);
+  padding-left: 10px;
+  border-left: 1px solid var(--header-border);
+}
+
+/* ─── Nav ───────────────────────────────────────────────── */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.navLink {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--header-fg-muted);
+  text-decoration: none;
+  padding: 6px var(--space-3);
+  border-radius: var(--radius-md);
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.navLink:hover {
+  color: var(--header-fg);
+  background: var(--header-hover-bg);
+  text-decoration: none;
+}
+
+.navLinkActive {
+  color: var(--header-fg);
+  background: var(--header-active-bg);
+}
+
+/* ─── City comparison controls ──────────────────────────── */
+.compare {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.vsChip {
+  font-size: var(--text-xs);
+  font-weight: 900;
+  color: var(--header-fg-muted);
+  letter-spacing: 0.12em;
+  flex-shrink: 0;
+}
+
+/* ─── City picker ───────────────────────────────────────── */
+.cityPicker {
+  position: relative;
+}
+
+.cityPickerTrigger {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid transparent;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.cityPicker_a .cityPickerTrigger {
+  background: var(--city-a-bg);
+  color: var(--city-a-accent);
+  border-color: var(--city-a-border);
+}
+
+.cityPicker_a .cityPickerTrigger:hover {
+  filter: brightness(0.95);
+}
+
+.cityPicker_b .cityPickerTrigger {
+  background: var(--city-b-bg);
+  color: var(--city-b-accent);
+  border-color: var(--city-b-border);
+}
+
+.cityPicker_b .cityPickerTrigger:hover {
+  filter: brightness(0.95);
+}
+
+.cityName {
+  min-width: 80px;
+  text-align: left;
+}
+
+/* Dropdown — always light surface regardless of header bg */
+.cityDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 200px;
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  z-index: 200;
+}
+
+.cityDropdownInput {
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  border-bottom: 1px solid var(--gray-200);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  color: var(--gray-900);
+  background: var(--gray-50);
+  outline: none;
+}
+
+.cityOption {
+  display: block;
+  width: 100%;
+  padding: 9px 14px;
+  border: none;
+  background: transparent;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  color: var(--gray-800);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.cityOption:hover {
+  background: var(--gray-100);
+}
+
+/* ─── Right actions ─────────────────────────────────────── */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+/* ─── Design system switcher ────────────────────────────── */
+.designSwitcher {
+  position: relative;
+}
+
+.designBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--header-border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  color: var(--header-fg-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.designBtn:hover {
+  color: var(--header-fg);
+  background: var(--header-hover-bg);
+}
+
+.designLabel {
+  /* compact on smaller viewports if needed later */
+}
+
+/* Design menu — always light surface */
+.designMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 186px;
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 6px;
+  z-index: 200;
+}
+
+.designMenuLabel {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gray-400);
+  padding: 4px 8px 8px;
+  border-bottom: 1px solid var(--gray-100);
+  margin-bottom: 4px;
+}
+
+.designOption {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  color: var(--gray-600);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.designOption:hover {
+  background: var(--gray-100);
+  color: var(--gray-900);
+}
+
+.designOptionActive {
+  background: #f0fdf4;
+  color: var(--gray-900);
+}
+
+.check {
+  margin-left: auto;
+  color: #16a34a;
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+/* ─── GitHub button ─────────────────────────────────────── */
+.ghBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 12px;
+  border: 1px solid var(--header-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--header-fg-muted);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.ghBtn:hover {
+  color: var(--header-fg);
+  background: var(--header-hover-bg);
+  text-decoration: none;
+}
+
+.ghIcon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
