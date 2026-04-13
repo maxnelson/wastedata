@@ -1,0 +1,106 @@
+:root {
+  /* ─── Brand greens ─────────────────────────────────────── */
+  --brand-900: #0c2318;
+  --brand-800: #1b4332;
+  --brand-700: #2d6a4f;
+  --brand-600: #40916c;
+  --brand-500: #52b788;
+  --brand-400: #74c69d;
+  --brand-300: #95d5b2;
+  --brand-100: #d8f3dc;
+  --brand-50:  #f0faf4;
+
+  /* ─── Neutrals ─────────────────────────────────────────── */
+  --gray-950: #080c0a;
+  --gray-900: #111827;
+  --gray-800: #1f2937;
+  --gray-700: #374151;
+  --gray-600: #4b5563;
+  --gray-500: #6b7280;
+  --gray-400: #9ca3af;
+  --gray-300: #d1d5db;
+  --gray-200: #e5e7eb;
+  --gray-100: #f3f4f6;
+  --gray-50:  #f9fafb;
+
+  /* ─── Semantic surfaces ────────────────────────────────── */
+  --surface-base:    #f4f6f8;
+  --surface-card:    #ffffff;
+  --surface-sidebar: #ffffff;
+  --surface-header:  var(--brand-800);
+
+  /* ─── Semantic text ────────────────────────────────────── */
+  --text-primary:       #111827;
+  --text-secondary:     #4b5563;
+  --text-muted:         #9ca3af;
+  --text-on-dark:       #ffffff;
+  --text-on-dark-muted: rgba(255, 255, 255, 0.55);
+
+  /* ─── Semantic borders ─────────────────────────────────── */
+  --border-subtle: #e5e7eb;
+  --border-strong: #d1d5db;
+  --border-focus:  var(--brand-500);
+
+  /* ─── Waste category palette ───────────────────────────── */
+  /* These must stay in sync with the D3 color scale         */
+  --cat-organic:      #52b788;
+  --cat-paper:        #4895ef;
+  --cat-plastic:      #f77f00;
+  --cat-construction: #a07850;
+  --cat-metal:        #8b9fa8;
+  --cat-residue:      #6b7280;
+  --cat-special:      #f4c430;
+  --cat-glass:        #06b6d4;
+  --cat-electronics:  #9b5de5;
+  --cat-hhw:          #fb7185;
+
+  /* ─── Status ───────────────────────────────────────────── */
+  --status-positive: #22c55e;
+  --status-negative: #ef4444;
+
+  /* ─── Typography ───────────────────────────────────────── */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: ui-monospace, 'JetBrains Mono', 'Fira Code', monospace;
+
+  --text-xs:   11px;
+  --text-sm:   13px;
+  --text-base: 14px;
+  --text-md:   16px;
+  --text-lg:   18px;
+  --text-xl:   22px;
+  --text-2xl:  28px;
+  --text-3xl:  38px;
+
+  /* ─── Spacing ──────────────────────────────────────────── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ─── Radius ───────────────────────────────────────────── */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-full: 9999px;
+
+  /* ─── Shadows ──────────────────────────────────────────── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+
+  /* ─── Layout ───────────────────────────────────────────── */
+  --header-height: 56px;
+  --sidebar-width: 256px;
+
+  /* ─── Transitions ──────────────────────────────────────── */
+  --transition-fast: 120ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+}
