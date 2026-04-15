@@ -20,6 +20,9 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--accent-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Row wrapping the inline city picker + optional close button */
@@ -58,6 +61,9 @@
 .cityMeta {
   font-size: var(--text-sm);
   color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ─── Per-capita hero ───────────────────────────────────── */
