@@ -12,6 +12,14 @@ dist-ssr/
 
 # Logs
 npm-debug.log*
+logs/
+
+# Raw source data (binary xlsx files — re-downloadable via tools/data_extraction/)
+data/raw/
+
+# Python bytecode
+__pycache__/
+*.pyc
 
 # Claude Code local settings (machine-specific)
 .claude/

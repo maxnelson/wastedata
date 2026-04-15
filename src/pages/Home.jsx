@@ -5,16 +5,34 @@ import { faTrashCan } from '@fortawesome/pro-regular-svg-icons'
 import styles from './Home.module.css'
 import { MOCK_DATA } from '../data/cities'
 
-// Matches var(--cat-*) tokens in order, rendered as conic-gradient stops
-const CATEGORIES = [
-  { name: 'Organic',               pct: 42, color: '#52b788' },
-  { name: 'Paper & Cardboard',     pct: 24, color: '#4895ef' },
-  { name: 'Plastic',               pct: 12, color: '#f77f00' },
-  { name: 'Construction & Inerts', pct: 11, color: '#a07850' },
-  { name: 'Metal',                 pct:  3, color: '#8b9fa8' },
-  { name: 'Mixed Residue',         pct:  3, color: '#6b7280' },
-  { name: 'Special Waste',         pct:  3, color: '#f4c430' },
-  { name: 'Glass',                 pct:  2, color: '#06b6d4' },
+// Color palette for material categories — matches var(--cat-*) tokens
+const CATEGORY_COLORS = {
+  'Organic':               '#52b788',
+  'Paper & Cardboard':     '#4895ef',
+  'Plastic':               '#f77f00',
+  'Construction & Inerts': '#a07850',
+  'Metal':                 '#8b9fa8',
+  'Mixed Residue':         '#6b7280',
+  'Special Waste':         '#f4c430',
+  'Glass':                 '#06b6d4',
+}
+
+// Canonical order for display
+const CATEGORY_ORDER = [
+  'Organic', 'Paper & Cardboard', 'Plastic', 'Construction & Inerts',
+  'Metal', 'Mixed Residue', 'Special Waste', 'Glass',
+]
+
+// Fallback statewide averages when no characterization data is available
+const FALLBACK_CATEGORIES = [
+  { name: 'Organic',               pct: 42 },
+  { name: 'Paper & Cardboard',     pct: 24 },
+  { name: 'Plastic',               pct: 12 },
+  { name: 'Construction & Inerts', pct: 11 },
+  { name: 'Metal',                 pct:  3 },
+  { name: 'Mixed Residue',         pct:  3 },
+  { name: 'Special Waste',         pct:  3 },
+  { name: 'Glass',                 pct:  2 },
 ]
 
 // Build conic-gradient stops from pct values
@@ -43,10 +61,20 @@ const BAR_HEIGHTS = [
 
 export default function Home({ city = 'Berkeley', vsPerCapita = null }) {
   const data = MOCK_DATA[city] || MOCK_DATA['Berkeley']
-  const isImproving = data.yoy < 0
+  const isImproving = (data.yoy ?? 0) < 0
   const [activeTab,   setActiveTab]   = useState('disposed')
   const [activeTrend, setActiveTrend] = useState('quarterly')
   const [hoveredBar,  setHoveredBar]  = useState(null)
+
+  // Build category list from real characterization data if available
+  const charSource = activeTab === 'disposed' ? data.commercial : (data.residential || data.commercial)
+  const CATEGORIES = charSource
+    ? CATEGORY_ORDER.map(name => ({
+        name,
+        pct:   charSource[name]?.pct  ?? 0,
+        color: CATEGORY_COLORS[name],
+      }))
+    : FALLBACK_CATEGORIES.map(c => ({ ...c, color: CATEGORY_COLORS[c.name] }))
 
   // Performance color: compare against the other city if in comparison mode
   let perf = null
@@ -70,7 +98,7 @@ export default function Home({ city = 'Berkeley', vsPerCapita = null }) {
       <div className={styles.cityHeader}>
         <p className={styles.breadcrumb}>{data.county} County</p>
         <h1 className={styles.cityName}>{city}</h1>
-        <p className={styles.cityMeta}>Population {data.population}</p>
+        <p className={styles.cityMeta}>{data.pop2024 ? `Population ${data.pop2024.toLocaleString()}` : ''}</p>
       </div>
 
       {/* ── Per-capita hero ─────────────────────────────── */}
@@ -90,7 +118,7 @@ export default function Home({ city = 'Berkeley', vsPerCapita = null }) {
           <p className={styles.statLabel}>Total Disposed</p>
           <div className={styles.statValueRow}>
             <span className={`${styles.statValue} num`} style={{ color: 'var(--brand-700)' }}>
-              {data.total.toLocaleString()}
+              {Math.round(data.q1Total2024).toLocaleString()}
             </span>
             <span className={styles.statUnit}>tons</span>
           </div>
@@ -124,7 +152,7 @@ export default function Home({ city = 'Berkeley', vsPerCapita = null }) {
               className={`${styles.statValue} num`}
               style={{ color: isImproving ? 'var(--status-positive)' : 'var(--status-negative)' }}
             >
-              {data.yoy > 0 ? '+' : ''}{data.yoy}%
+              {data.yoy != null ? `${data.yoy > 0 ? '+' : ''}${data.yoy}%` : '—'}
             </span>
           </div>
           <p className={styles.statSub}>vs Q1 2023</p>
@@ -160,7 +188,7 @@ export default function Home({ city = 'Berkeley', vsPerCapita = null }) {
               style={{ background: buildConicGradient(CATEGORIES) }}
             />
             <div className={styles.donutCenter}>
-              <span className={`${styles.donutValue} num`}>{data.total.toLocaleString()}</span>
+              <span className={`${styles.donutValue} num`}>{Math.round(data.q1Total2024).toLocaleString()}</span>
               <span className={styles.donutUnit}>tons disposed</span>
             </div>
           </div>

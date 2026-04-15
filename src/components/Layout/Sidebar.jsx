@@ -9,8 +9,8 @@ const VIEW_TYPES = [
   { value: 'residential', label: 'Residential',  hint: 'Single & multi-family' },
 ]
 
-function SectionLabel({ children }) {
-  return <p className={styles.label}>{children}</p>
+function SectionLabel({ children, style }) {
+  return <p className={styles.label} style={style}>{children}</p>
 }
 
 function Divider() {
@@ -18,7 +18,6 @@ function Divider() {
 }
 
 export default function Sidebar() {
-  const [search,    setSearch]    = useState('')
   const [year,      setYear]      = useState(2024)
   const [quarter,   setQuarter]   = useState('Q1')
   const [viewType,  setViewType]  = useState('combined')
@@ -27,24 +26,6 @@ export default function Sidebar() {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.inner}>
-
-        {/* ── City search ─────────────────────────────── */}
-        <div className={styles.section}>
-          <div className={styles.searchWrapper}>
-            <svg className={styles.searchIcon} viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" clipRule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9z" />
-            </svg>
-            <input
-              className={styles.searchInput}
-              type="text"
-              placeholder="Search 419 jurisdictions..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <Divider />
 
         {/* ── Time period ──────────────────────────────── */}
         <div className={styles.section}>
