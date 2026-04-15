@@ -1,14 +1,3 @@
-export const CITIES = [
-  'Berkeley',
-  'Oakland',
-  'San Francisco',
-  'Alameda',
-  'Fremont',
-  'Hayward',
-  'San Leandro',
-  'Livermore',
-]
-
 export const MOCK_DATA = {
   Berkeley:        { perCapita: 3.2, total: 48234,  yoy: -2.1, population: '124,321', county: 'Alameda' },
   Oakland:         { perCapita: 3.8, total: 156820, yoy: +0.4, population: '440,646', county: 'Alameda' },
@@ -19,3 +8,19 @@ export const MOCK_DATA = {
   'San Leandro':   { perCapita: 3.6, total: 31840,  yoy: +0.7, population: '90,161',  county: 'Alameda' },
   Livermore:       { perCapita: 3.3, total: 30210,  yoy: -1.5, population: '93,003',  county: 'Alameda' },
 }
+
+// Keyed by "CityName|STATE" — used by CityPicker to match geo-lookup results against available data.
+// Keys must exactly match the city name Nominatim returns in address.city for a given jurisdiction.
+export const CITY_DATA = {
+  'Berkeley|CA':      MOCK_DATA['Berkeley'],
+  'Oakland|CA':       MOCK_DATA['Oakland'],
+  'San Francisco|CA': MOCK_DATA['San Francisco'],
+  'Alameda|CA':       MOCK_DATA['Alameda'],
+  'Fremont|CA':       MOCK_DATA['Fremont'],
+  'Hayward|CA':       MOCK_DATA['Hayward'],
+  'San Leandro|CA':   MOCK_DATA['San Leandro'],
+  'Livermore|CA':     MOCK_DATA['Livermore'],
+}
+
+// Fast O(1) lookup: does this app have data for a given "City|STATE" key?
+export const CITY_KEYS = new Set(Object.keys(CITY_DATA))

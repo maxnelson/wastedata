@@ -22,7 +22,6 @@ export default function Header() {
           />
         </svg>
         <span className={styles.logoName}>TrashData</span>
-        <span className={styles.logoRegion}>California</span>
       </div>
 
       {/* Nav */}

@@ -7,12 +7,15 @@ import Home from './pages/Home'
 import { MOCK_DATA } from './data/cities'
 import styles from './App.module.css'
 
+// Default city — must match a key in CITY_DATA
+const DEFAULT_CITY_A = { city: 'Berkeley', state: 'CA', key: 'Berkeley|CA' }
+
 export default function App() {
-  const [cityA, setCityA] = useState('Berkeley')
+  const [cityA, setCityA] = useState(DEFAULT_CITY_A)
   const [cityB, setCityB] = useState(null) // null = single-city mode
 
-  const perCapitaA = MOCK_DATA[cityA]?.perCapita ?? null
-  const perCapitaB = cityB ? (MOCK_DATA[cityB]?.perCapita ?? null) : null
+  const perCapitaA = MOCK_DATA[cityA?.city]?.perCapita ?? null
+  const perCapitaB = cityB ? (MOCK_DATA[cityB?.city]?.perCapita ?? null) : null
 
   return (
     <div className={styles.root}>
@@ -26,10 +29,10 @@ export default function App() {
         <Layout>
           <div className={`${styles.panels} ${cityB ? styles.comparing : ''}`}>
             <div className={styles.panelA}>
-              <Home city={cityA} vsPerCapita={perCapitaB} />
+              <Home city={cityA.city} vsPerCapita={perCapitaB} />
             </div>
             <div className={`${styles.panelB} ${cityB ? styles.panelBActive : ''}`}>
-              {cityB && <Home city={cityB} vsPerCapita={perCapitaA} />}
+              {cityB && <Home city={cityB.city} vsPerCapita={perCapitaA} />}
             </div>
           </div>
         </Layout>

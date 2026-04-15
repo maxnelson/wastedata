@@ -195,7 +195,9 @@
 }
 
 .cityOption {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   width: 100%;
   padding: 9px 14px;
   border: none;
@@ -209,11 +211,39 @@
   transition: background var(--transition-fast);
 }
 
-.cityOption:hover {
+.cityOption:hover:not(:disabled) {
   background: var(--gray-100);
 }
 
-.cityOptionEmpty {
+.cityOption:disabled {
+  cursor: not-allowed;
+}
+
+/* Keyboard-focused option (via arrow keys) */
+.cityOptionActive {
+  background: var(--gray-100);
+}
+
+/* Greyed-out rows for cities without data */
+.cityOptionDisabled {
+  opacity: 0.4;
+}
+
+/* City name — takes up natural left space */
+.cityOptionName {
+  flex: 1;
+}
+
+/* State/country abbreviation — pushed to the right */
+.cityOptionMeta {
+  flex-shrink: 0;
+  font-size: var(--text-xs);
+  font-weight: 400;
+  color: var(--gray-400);
+}
+
+/* Loading / empty hint text */
+.cityDropdownMeta {
   padding: 10px 14px;
   font-size: var(--text-sm);
   color: var(--gray-400);
