@@ -8,8 +8,8 @@
 .trigger {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 2px 8px 2px 6px;
+  gap: 32px;
+  padding: 12px 14px 12px 14px;
   background: transparent;
   border: 1.5px solid var(--gray-200);
   border-radius: 10px;
@@ -47,10 +47,11 @@
   /* Typography inherited from .trigger — just a semantic wrapper */
 }
 
-/* ─── Chevron icon ───────────────────────────────────────── */
-.chevron {
+/* ─── Trigger icons (search + chevron) ──────────────────── */
+.triggerIcons {
   display: flex;
   align-items: center;
+  gap: 5px;
   color: var(--gray-400);
   flex-shrink: 0;
   /* Optically align with the baseline of the large text */
@@ -58,7 +59,7 @@
   transition: color var(--transition-fast);
 }
 
-.trigger:hover .chevron {
+.trigger:hover .triggerIcons {
   color: var(--gray-600);
 }
 
@@ -67,7 +68,7 @@
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-  min-width: 300px;
+  min-width: 360px;
   background: #fff;
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-lg);

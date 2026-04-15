@@ -172,7 +172,10 @@ export default function CityPicker({ value, onChange, excludeCity, openOnMount, 
         <span className={styles.cityName}>
           {value?.city ?? 'Choose a city'}
         </span>
-        <span className={styles.chevron}><ChevronDown /></span>
+        <span className={styles.triggerIcons}>
+          <SearchIcon />
+          <ChevronDown />
+        </span>
       </button>
 
       {/* Search dropdown */}
