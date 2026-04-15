@@ -32,7 +32,7 @@
 .panelA {
   flex: 1;
   min-width: 0;
-  overflow-x: hidden; /* clip content at panel edge — prevents overlap with panelB */
+  overflow-x: clip; /* clip content at panel edge without creating a scroll container */
   container-type: inline-size;
   container-name: cityPanel;
 }

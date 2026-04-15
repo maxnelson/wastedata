@@ -76,20 +76,31 @@
   text-align: center;
 }
 
-.heroIcon {
-  font-size: 26px;
-  color: var(--accent-color);
-}
-
 .heroNum {
   display: flex;
   align-items: baseline;
   gap: var(--space-2);
   line-height: 1;
+  font-size: clamp(52px, 7vw, 80px);
+  max-width: 100%; /* prevents centering overflow that clips icon on the left */
+}
+
+/* Icon + number lockup — always stays horizontal */
+.heroLockup {
+  display: inline-flex;
+  align-items: center; /* vertically center icon relative to number */
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.heroIcon {
+  font-size: 1em; /* matches heroNum font-size — same apparent scale as number */
+  color: var(--accent-color);
+  flex-shrink: 0;
 }
 
 .heroValue {
-  font-size: clamp(52px, 7vw, 80px);
+  font-size: 1em; /* inherits clamp from heroNum */
   font-weight: 800;
   letter-spacing: -3px;
   color: var(--accent-color);
@@ -435,7 +446,7 @@
     grid-template-columns: 1fr;
   }
 
-  .heroValue {
+  .heroNum {
     font-size: clamp(38px, 9cqi, 60px);
   }
 }

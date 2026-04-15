@@ -155,10 +155,10 @@ export default function Home({
       {/* ── Per-capita hero ─────────────────────────────── */}
       <div className={styles.hero}>
         <div className={styles.heroNum}>
-          <div>
+          <span className={styles.heroLockup}>
             <FontAwesomeIcon icon={faTrashCan} className={styles.heroIcon} />
             <span className={`${styles.heroValue} num`}>{data.perCapita}</span>
-          </div>
+          </span>
           <span className={styles.heroUnit}>lbs</span>
         </div>
         <p className={styles.heroLabel}>per person · per day</p>
