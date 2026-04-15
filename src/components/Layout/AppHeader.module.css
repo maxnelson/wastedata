@@ -25,8 +25,7 @@
 }
 
 .logoMark {
-  width: 22px;
-  height: 22px;
+  font-size: 20px;
   color: var(--header-accent);
   flex-shrink: 0;
 }

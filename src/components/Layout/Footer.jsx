@@ -39,7 +39,7 @@ export default function Footer() {
         </a>
         <span className={styles.sep} />
         <a
-          href="https://github.com"
+          href="https://github.com/maxnelson/wastedata"
           className={styles.footerLink}
           target="_blank"
           rel="noreferrer"
@@ -48,7 +48,7 @@ export default function Footer() {
         </a>
       </nav>
 
-      <p className={styles.copy}>© {new Date().getFullYear()} TrashData CA</p>
+      <p className={styles.copy}>© {new Date().getFullYear()} WasteData CA</p>
 
     </footer>
   )
