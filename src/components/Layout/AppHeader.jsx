@@ -4,6 +4,13 @@ import { faTrashCan } from '@fortawesome/pro-regular-svg-icons'
 import styles from './AppHeader.module.css'
 import { CITY_KEYS } from '../../data/cities'
 
+// Maps Nominatim city names → CalRecycle jurisdiction names where they differ.
+// Add an entry here when searching a city shows it greyed-out despite having data.
+const NOMINATIM_TO_CALRECYCLE = {
+  'Ventura|CA':  'San Buenaventura|CA',
+  'Carmel|CA':   'Carmel-by-the-Sea|CA',
+}
+
 function SearchIcon() {
   return (
     <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor">
@@ -90,7 +97,9 @@ function CityPicker({ value, onChange, side, placeholder, excludeCity }) {
             const key = stateCode ? `${city}|${stateCode}` : `${city}|${country.toUpperCase()}`
             if (seen.has(key)) return null
             seen.add(key)
-            return { city, state: stateCode, country, key, hasData: CITY_KEYS.has(key) }
+            const resolvedKey = NOMINATIM_TO_CALRECYCLE[key] ?? key
+            const hasData = CITY_KEYS.has(resolvedKey)
+            return { city, state: stateCode, country, key: resolvedKey, hasData }
           })
           .filter(Boolean)
 
