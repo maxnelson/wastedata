@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrashCan } from '@fortawesome/pro-regular-svg-icons'
 import styles from './Home.module.css'
 import { MOCK_DATA } from '../data/cities'
+import CityPicker from '../components/CityPicker'
 
 // Color palette for material categories — matches var(--cat-*) tokens
 const CATEGORY_COLORS = {
@@ -59,12 +60,19 @@ const BAR_HEIGHTS = [
   70, 68, 72, 69,   // 2024
 ]
 
-export default function Home({ city = 'Berkeley', vsPerCapita = null }) {
+export default function Home({
+  city = 'Berkeley',
+  cityObj = null,
+  onCityChange,
+  excludeCity,
+  vsPerCapita = null,
+}) {
   const data = MOCK_DATA[city] || MOCK_DATA['Berkeley']
-  const isImproving = (data.yoy ?? 0) < 0
   const [activeTab,   setActiveTab]   = useState('disposed')
   const [activeTrend, setActiveTrend] = useState('quarterly')
   const [hoveredBar,  setHoveredBar]  = useState(null)
+
+  const isImproving = (data.yoy ?? 0) < 0
 
   // Build category list from real characterization data if available
   const charSource = activeTab === 'disposed' ? data.commercial : (data.residential || data.commercial)
@@ -96,8 +104,17 @@ export default function Home({ city = 'Berkeley', vsPerCapita = null }) {
 
       {/* ── City header ────────────────────────────────── */}
       <div className={styles.cityHeader}>
-        <p className={styles.breadcrumb}>{data.county} County</p>
-        <h1 className={styles.cityName}>{city}</h1>
+        <p className={styles.breadcrumb}>
+          {data.county ? `${data.county} County` : ''}
+          {cityObj?.state ? ` · ${cityObj.state}` : ''}
+        </p>
+        <div className={styles.cityNameRow}>
+          <CityPicker
+            value={cityObj}
+            onChange={onCityChange}
+            excludeCity={excludeCity}
+          />
+        </div>
         <p className={styles.cityMeta}>{data.pop2024 ? `Population ${data.pop2024.toLocaleString()}` : ''}</p>
       </div>
 

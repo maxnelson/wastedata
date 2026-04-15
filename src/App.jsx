@@ -1,43 +1,78 @@
-import { useState } from 'react'
+import { Routes, Route, Navigate, useParams, useNavigate } from 'react-router-dom'
 import './App.css'
 import AppHeader from './components/Layout/AppHeader'
 import Footer from './components/Layout/Footer'
 import Layout from './components/Layout/Layout'
 import Home from './pages/Home'
 import { MOCK_DATA } from './data/cities'
+import { segmentToCityObj, cityObjToSegment, randomCityPair } from './utils/cityUrl'
 import styles from './App.module.css'
 
-// Default city — must match a key in CITY_DATA
-const DEFAULT_CITY_A = { city: 'Berkeley', state: 'CA', key: 'Berkeley|CA' }
+/** Picks two random cities and redirects immediately. */
+function RandomRedirect() {
+  const [a, b] = randomCityPair()
+  return <Navigate to={`/compare/${cityObjToSegment(a)}/${cityObjToSegment(b)}`} replace />
+}
 
-export default function App() {
-  const [cityA, setCityA] = useState(DEFAULT_CITY_A)
-  const [cityB, setCityB] = useState(null) // null = single-city mode
+/** Main comparison view — city state lives entirely in the URL. */
+function CompareView() {
+  const { slugA, slugB } = useParams()
+  const navigate = useNavigate()
 
-  const perCapitaA = MOCK_DATA[cityA?.city]?.perCapita ?? null
-  const perCapitaB = cityB ? (MOCK_DATA[cityB?.city]?.perCapita ?? null) : null
+  const cityA = segmentToCityObj(slugA)
+  const cityB = segmentToCityObj(slugB)
+
+  // Unknown slugs → start over with random cities
+  if (!cityA || !cityB) return <Navigate to="/" replace />
+
+  function handleCityAChange(newCity) {
+    navigate(`/compare/${cityObjToSegment(newCity)}/${slugB}`, { replace: true })
+  }
+  function handleCityBChange(newCity) {
+    navigate(`/compare/${slugA}/${cityObjToSegment(newCity)}`, { replace: true })
+  }
+
+  const perCapitaA = MOCK_DATA[cityA.city]?.perCapita ?? null
+  const perCapitaB = MOCK_DATA[cityB.city]?.perCapita ?? null
 
   return (
     <div className={styles.root}>
-      <AppHeader
-        cityA={cityA}
-        cityB={cityB}
-        onCityAChange={setCityA}
-        onCityBChange={setCityB}
-      />
+      <AppHeader />
       <div className={styles.body}>
         <Layout>
-          <div className={`${styles.panels} ${cityB ? styles.comparing : ''}`}>
+          <div className={`${styles.panels} ${styles.comparing}`}>
             <div className={styles.panelA}>
-              <Home city={cityA.city} vsPerCapita={perCapitaB} />
+              <Home
+                city={cityA.city}
+                cityObj={cityA}
+                onCityChange={handleCityAChange}
+                excludeCity={cityB}
+                vsPerCapita={perCapitaB}
+              />
             </div>
-            <div className={`${styles.panelB} ${cityB ? styles.panelBActive : ''}`}>
-              {cityB && <Home city={cityB.city} vsPerCapita={perCapitaA} />}
+            <div className={`${styles.panelB} ${styles.panelBActive}`}>
+              <Home
+                city={cityB.city}
+                cityObj={cityB}
+                onCityChange={handleCityBChange}
+                excludeCity={cityA}
+                vsPerCapita={perCapitaA}
+              />
             </div>
           </div>
         </Layout>
       </div>
       <Footer />
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/"                       element={<RandomRedirect />} />
+      <Route path="/compare/:slugA/:slugB"  element={<CompareView />} />
+      <Route path="*"                       element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }

@@ -74,218 +74,42 @@
   background: var(--header-active-bg);
 }
 
-/* ─── City comparison controls ──────────────────────────── */
-.compare {
-  flex: 1;
+/* ─── Right actions ─────────────────────────────────────── */
+.actions {
+  margin-left: auto;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: var(--space-3);
-}
-
-/* ─── Comparison delimiter ──────────────────────────────── */
-.delimiter {
-  font-size: 16px;
-  color: var(--header-fg-muted);
   flex-shrink: 0;
-  opacity: 0.35;
-  transition: opacity var(--transition-base);
-  user-select: none;
-  /* Prevent the glyph from contributing to layout shift */
-  width: 20px;
-  text-align: center;
 }
 
-/* Once a city B is selected, the delimiter brightens */
-.delimiterActive {
-  opacity: 0.7;
-}
-
-/* ─── City picker ───────────────────────────────────────── */
-.cityPicker {
-  position: relative;
-}
-
-.cityPickerTrigger {
+/* ─── Compare button ────────────────────────────────────── */
+.compareBtn {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 7px 13px;
+  gap: 5px;
+  padding: 6px 14px;
+  border: 1.5px solid var(--header-border);
   border-radius: var(--radius-full);
-  border: 1.5px solid transparent;
+  background: transparent;
   font-size: var(--text-sm);
   font-family: var(--font-sans);
   font-weight: 600;
+  color: var(--header-fg-muted);
   cursor: pointer;
   transition: all var(--transition-fast);
   white-space: nowrap;
 }
 
-/* City A — always set, full color */
-.cityPicker_a .cityPickerTrigger {
-  background: var(--city-a-bg);
-  color: var(--city-a-accent);
-  border-color: var(--city-a-border);
-}
-
-.cityPicker_a .cityPickerTrigger:hover {
-  filter: brightness(0.95);
-}
-
-/* City B — set state */
-.cityPicker_b .cityPickerTrigger {
-  background: var(--city-b-bg);
-  color: var(--city-b-accent);
-  border-color: var(--city-b-border);
-}
-
-.cityPicker_b .cityPickerTrigger:hover {
-  filter: brightness(0.95);
-}
-
-/* City B — unset/placeholder state */
-.cityPicker_b.cityPickerUnset .cityPickerTrigger {
-  background: transparent;
-  border-style: dashed;
-  border-color: var(--header-border);
-  color: var(--header-fg-muted);
-  opacity: 0.75;
-}
-
-.cityPicker_b.cityPickerUnset .cityPickerTrigger:hover {
-  opacity: 1;
+.compareBtn:hover {
+  color: var(--header-fg);
   background: var(--header-hover-bg);
-  filter: none;
 }
 
-.cityName {
-  min-width: 72px;
-  text-align: left;
-}
-
-/* Placeholder text — lighter weight to hint it's not yet selected */
-.cityNamePlaceholder {
-  font-weight: 500;
-}
-
-/* Dropdown — always light surface regardless of header bg */
-.cityDropdown {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  min-width: 200px;
-  background: #fff;
-  border: 1px solid var(--gray-200);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  overflow: hidden;
-  z-index: 200;
-}
-
-.cityDropdownInput {
-  width: 100%;
-  padding: 10px 14px;
-  border: none;
-  border-bottom: 1px solid var(--gray-200);
-  font-size: var(--text-sm);
-  font-family: var(--font-sans);
-  color: var(--gray-900);
-  background: var(--gray-50);
-  outline: none;
-}
-
-.cityOption {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  width: 100%;
-  padding: 9px 14px;
-  border: none;
-  background: transparent;
-  font-size: var(--text-sm);
-  font-family: var(--font-sans);
-  font-weight: 500;
-  color: var(--gray-800);
-  text-align: left;
-  cursor: pointer;
-  transition: background var(--transition-fast);
-}
-
-.cityOption:hover:not(:disabled) {
-  background: var(--gray-100);
-}
-
-.cityOption:disabled {
-  cursor: not-allowed;
-}
-
-/* Keyboard-focused option (via arrow keys) */
-.cityOptionActive {
-  background: var(--gray-100);
-}
-
-/* Greyed-out rows for cities without data */
-.cityOptionDisabled {
-  opacity: 0.4;
-}
-
-/* City name — takes up natural left space */
-.cityOptionName {
-  flex: 1;
-}
-
-/* State/country abbreviation — pushed to the right */
-.cityOptionMeta {
-  flex-shrink: 0;
-  font-size: var(--text-xs);
-  font-weight: 400;
-  color: var(--gray-400);
-}
-
-/* Loading / empty hint text */
-.cityDropdownMeta {
-  padding: 10px 14px;
-  font-size: var(--text-sm);
-  color: var(--gray-400);
-  font-style: italic;
-}
-
-/* ─── Close comparison button ───────────────────────────── */
-/* Always in DOM — opacity transition avoids layout shift */
-.closeCompareBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
-  font-size: 12px;
-  color: var(--header-fg-muted);
-  cursor: pointer;
-  flex-shrink: 0;
+/* Fade out when comparison is already active */
+.compareBtnHidden {
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
-}
-
-.closeCompareBtnVisible {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.closeCompareBtn:hover {
-  background: var(--header-hover-bg);
-  color: var(--header-fg);
-}
-
-/* ─── Right actions ─────────────────────────────────────── */
-.actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  flex-shrink: 0;
 }
 
 /* ─── Design system switcher ────────────────────────────── */
