@@ -1,15 +1,17 @@
 /* ─── Picker container ───────────────────────────────────── */
 .picker {
   position: relative;
-  display: inline-block;
+  display: block;
+  max-width: 100%;
 }
 
 /* ─── Trigger button — styled as the big bold city h1 ───── */
 .trigger {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 32px;
   padding: 12px 14px 12px 14px;
+  max-width: 100%;
   background: transparent;
   border: 1.5px solid var(--gray-200);
   border-radius: 10px;
@@ -44,7 +46,10 @@
 
 /* ─── City name text ─────────────────────────────────────── */
 .cityName {
-  /* Typography inherited from .trigger — just a semantic wrapper */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ─── Trigger icons (search + chevron) ──────────────────── */

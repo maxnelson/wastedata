@@ -97,127 +97,50 @@
   color: #fff;
 }
 
-/* ─── Radio group ──────────────────────────────────────── */
-.radioGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+/* ─── Mobile: sidebar becomes horizontal toolbar ─────── */
+@media (max-width: 768px) {
+  .sidebar {
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: var(--mobile-sidebar-height);
+    flex-direction: row;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+    overflow: visible;
+  }
 
-.radioLabel {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
-  padding: 7px var(--space-2);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: background var(--transition-fast);
-}
+  .inner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 var(--space-4);
+    gap: var(--space-3);
+    flex: 1;
+  }
 
-.radioLabel:hover {
-  background: var(--gray-100);
-}
+  .section {
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-2);
+  }
 
-.radioLabelActive {
-  background: var(--brand-50);
-}
+  .label {
+    display: none;
+  }
 
-.radioInput {
-  width: 15px;
-  height: 15px;
-  accent-color: var(--brand-600);
-  cursor: pointer;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
+  .divider {
+    display: none;
+  }
 
-.radioText {
-  display: block;
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--text-primary);
-  line-height: 1.3;
-}
+  .select {
+    width: 90px;
+  }
 
-.radioHint {
-  display: block;
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-  margin-top: 1px;
+  .pillGroup {
+    margin-top: 0;
+  }
 }
-
-/* ─── Toggle ───────────────────────────────────────────── */
-.toggleRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.toggleLabel {
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--text-primary);
-  margin-bottom: 2px;
-}
-
-.toggleHint {
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-}
-
-.toggle {
-  position: relative;
-  width: 40px;
-  height: 22px;
-  border-radius: var(--radius-full);
-  background: var(--gray-300);
-  border: none;
-  cursor: pointer;
-  flex-shrink: 0;
-  padding: 0;
-  transition: background var(--transition-base);
-}
-
-.toggleOn {
-  background: var(--brand-600);
-}
-
-.toggleThumb {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: var(--shadow-sm);
-  transition: transform var(--transition-base);
-}
-
-.toggleOn .toggleThumb {
-  transform: translateX(18px);
-}
-
-/* ─── Coverage bar ─────────────────────────────────────── */
-.coverageBar {
-  width: 100%;
-  height: 4px;
-  background: var(--gray-200);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-  margin-bottom: var(--space-2);
-}
-
-.coverageFill {
-  height: 100%;
-  background: var(--brand-500);
-  border-radius: var(--radius-full);
-  transition: width var(--transition-slow);
-}
-
-.coverageText {
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-}
-

@@ -59,6 +59,7 @@
   --header-height: 56px;
   --footer-height: 44px;
   --sidebar-width: 256px;
+  --mobile-sidebar-height: 52px;
 
   /* ── Transitions ───────────────────────────────────────── */
   --transition-fast: 120ms ease;
