@@ -258,37 +258,6 @@
   box-shadow: var(--shadow-xs);
 }
 
-/* ─── Legend ────────────────────────────────────────────── */
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 20px;
-}
-
-.legendRow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.legendSwatch {
-  width: 10px;
-  height: 10px;
-  border-radius: 3px;
-  flex-shrink: 0;
-}
-
-.legendName {
-  flex: 1;
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.legendPct {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--text-primary);
-}
 
 /* ─── Bar chart ─────────────────────────────────────────── */
 .barChart {

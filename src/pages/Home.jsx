@@ -167,19 +167,6 @@ export default function Home({
         <div className={styles.heroAccentBar} />
       </div>
 
-      {/* ── Legend — above donut ────────────────────────── */}
-      <div className={styles.legend}>
-        {CATEGORIES.map((cat) => (
-          <div key={cat.name} className={styles.legendRow}>
-            <span
-              className={styles.legendSwatch}
-              style={{ background: cat.color }}
-            />
-            <span className={styles.legendName}>{cat.name}</span>
-          </div>
-        ))}
-      </div>
-
       {/* ── Donut — full content width ──────────────────── */}
       <DonutChart categories={CATEGORIES} />
 

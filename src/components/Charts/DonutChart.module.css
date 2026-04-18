@@ -1,3 +1,8 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
 .donut {
   cursor: default;
 }
@@ -16,4 +21,70 @@
   fill: var(--gray-600);
   letter-spacing: -2px;
   pointer-events: none;
+}
+
+.centerLabel {
+  font-family: var(--font-sans);
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0;
+  pointer-events: none;
+}
+
+/* ─── Explanation panel ──────────────────────────────────── */
+.explanation {
+  padding: var(--space-3) 0;
+  margin-top: var(--space-4);
+}
+
+.explanationHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  width: fit-content;
+}
+
+.explanationTitle {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+}
+
+.infoBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  border: none;
+  background: transparent;
+  color: var(--gray-400);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), background var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.infoBtn:hover {
+  color: var(--gray-700);
+  background: var(--gray-100);
+}
+
+.infoBtnActive {
+  color: var(--gray-700);
+}
+
+.explanationBody {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-top: var(--space-3);
+}
+
+.explanationPrompt {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-style: italic;
 }
