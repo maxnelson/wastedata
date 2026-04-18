@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import styles from './CityPicker.module.css'
 import { CITY_KEYS } from '../data/cities'
 
@@ -9,27 +9,19 @@ const NOMINATIM_TO_CALRECYCLE = {
   'Carmel|CA':   'Carmel-by-the-Sea|CA',
 }
 
-function SearchIcon() {
+function CheckIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-      <path fillRule="evenodd" clipRule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9z" />
-    </svg>
-  )
-}
-
-function ChevronDown() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-      <path fillRule="evenodd" clipRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" />
+    <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path fillRule="evenodd" clipRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" />
     </svg>
   )
 }
 
 /**
- * CityPicker — inline variant
+ * CityPicker — inline textarea variant
  *
- * Renders as a large bold city name with a subtle border + chevron.
- * Clicking it opens a Nominatim-backed search dropdown.
+ * The city name heading is itself a search textarea. Clicking places the cursor
+ * and shows dropdown results immediately; typing filters them live.
  *
  * Props:
  *   value        — { city, state, key } | null
@@ -39,18 +31,29 @@ function ChevronDown() {
  *   onCloseEmpty — called when user dismisses without selecting (e.g. Escape with no value set)
  */
 export default function CityPicker({ value, onChange, excludeCity, openOnMount, onCloseEmpty }) {
-  const [open, setOpen]         = useState(openOnMount ?? false)
-  const [query, setQuery]       = useState('')
-  const [results, setResults]   = useState([])
-  const [loading, setLoading]   = useState(false)
+  const [open, setOpen]           = useState(false)
+  const [query, setQuery]         = useState('')
+  const [results, setResults]     = useState([])
+  const [loading, setLoading]     = useState(false)
   const [activeIdx, setActiveIdx] = useState(-1)
   const containerRef = useRef(null)
   const inputRef     = useRef(null)
 
-  // Focus the input whenever the dropdown opens
+  // The value shown in the textarea: city name when closed, live query when open
+  const displayValue = open ? query : (value?.city ?? '')
+
+  // Auto-resize the textarea to fit its content (allows multi-line wrapping)
+  useLayoutEffect(() => {
+    const el = inputRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = el.scrollHeight + 'px'
+  }, [displayValue])
+
+  // openOnMount: focus the textarea so the dropdown opens immediately
   useEffect(() => {
-    if (open) inputRef.current?.focus()
-  }, [open])
+    if (openOnMount) inputRef.current?.focus()
+  }, [openOnMount])
 
   // Close dropdown on outside click; if no value was ever set, collapse City B entirely
   useEffect(() => {
@@ -123,16 +126,26 @@ export default function CityPicker({ value, onChange, excludeCity, openOnMount, 
     return () => { clearTimeout(timer); controller.abort() }
   }, [query])
 
-  // Filter out the currently-selected city and the other picker's city
-  const visible = results.filter(
-    r => r.key !== value?.key && r.key !== excludeCity?.key
-  )
+  // Filter out only the other picker's city; keep the currently-selected city so it shows with a checkmark
+  const visible = results.filter(r => r.key !== excludeCity?.key)
 
-  function handleTriggerClick() {
-    setOpen(v => !v)
+  function handleFocus() {
+    const initial = value?.city ?? ''
+    setQuery(initial)
+    setActiveIdx(-1)
+    setOpen(true)
+    // Kick off a search immediately using the current city name
+    if (initial.length >= 2) setLoading(true)
+    // Don't select all — browser places cursor at the click position naturally
+  }
+
+  // Handles Tab-key dismissal; mousedown listener handles click-outside
+  function handleBlur(e) {
+    if (containerRef.current?.contains(e.relatedTarget)) return
+    setOpen(false)
     setQuery('')
     setResults([])
-    setActiveIdx(-1)
+    if (!value) onCloseEmpty?.()
   }
 
   function handleSelect(result) {
@@ -144,79 +157,70 @@ export default function CityPicker({ value, onChange, excludeCity, openOnMount, 
   }
 
   function handleKeyDown(e) {
-    if (e.key === 'ArrowDown') {
+    if (e.key === 'Enter') {
+      // Never insert a newline; confirm the highlighted result if any
+      e.preventDefault()
+      const target = visible[activeIdx]
+      if (target?.hasData) handleSelect(target)
+    } else if (e.key === 'ArrowDown') {
       e.preventDefault()
       setActiveIdx(i => Math.min(i + 1, visible.length - 1))
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
       setActiveIdx(i => Math.max(i - 1, -1))
-    } else if (e.key === 'Enter') {
-      e.preventDefault()
-      const target = visible[activeIdx]
-      if (target?.hasData) handleSelect(target)
     } else if (e.key === 'Escape') {
       setOpen(false)
+      setQuery('')
+      setResults([])
       if (!value) onCloseEmpty?.()
     }
   }
 
   return (
     <div ref={containerRef} className={styles.picker}>
-      {/* Trigger — big bold city name styled as a button */}
-      <button
-        className={`${styles.trigger} ${!value ? styles.triggerEmpty : ''}`}
-        onClick={handleTriggerClick}
+      {/* City name — a textarea so long names wrap on small screens */}
+      <textarea
+        ref={inputRef}
+        className={styles.cityInput}
+        value={displayValue}
+        placeholder="Choose a city"
+        rows={1}
         aria-expanded={open}
         aria-haspopup="listbox"
-      >
-        <span className={styles.cityName}>
-          {value?.city ?? 'Choose a city'}
-        </span>
-        <span className={styles.triggerIcons}>
-          <SearchIcon />
-          <ChevronDown />
-        </span>
-      </button>
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onChange={e => { setQuery(e.target.value); setActiveIdx(-1) }}
+        onKeyDown={handleKeyDown}
+      />
 
-      {/* Search dropdown */}
+      {/* Results dropdown */}
       {open && (
         <div className={styles.dropdown} role="listbox">
-          <div className={styles.searchWrapper}>
-            <span className={styles.searchIcon}><SearchIcon /></span>
-            <input
-              ref={inputRef}
-              className={styles.searchInput}
-              placeholder="Search cities…"
-              value={query}
-              onChange={e => { setQuery(e.target.value); setActiveIdx(-1) }}
-              onKeyDown={handleKeyDown}
-            />
-          </div>
-
           {loading && (
             <p className={styles.meta}>Searching…</p>
           )}
           {!loading && query.length >= 2 && visible.length === 0 && (
             <p className={styles.meta}>No cities found</p>
           )}
-          {!loading && query.length < 2 && (
-            <p className={styles.meta}>Type to search cities…</p>
-          )}
 
           {!loading && visible.map((r, i) => {
             const displayState = r.state || r.country?.toUpperCase()
+            const isSelected   = r.key === value?.key
             return (
               <button
                 key={r.key}
                 role="option"
+                aria-selected={isSelected}
                 className={[
                   styles.option,
-                  !r.hasData    ? styles.optionDisabled : '',
-                  i === activeIdx ? styles.optionActive  : '',
+                  !r.hasData      ? styles.optionDisabled  : '',
+                  isSelected      ? styles.optionSelected  : '',
+                  i === activeIdx ? styles.optionActive    : '',
                 ].join(' ')}
                 disabled={!r.hasData}
                 onClick={() => r.hasData && handleSelect(r)}
               >
+                {isSelected && <span className={styles.optionCheck}><CheckIcon /></span>}
                 <span className={styles.optionName}>{r.city}</span>
                 <span className={styles.optionMeta}>{displayState}</span>
               </button>

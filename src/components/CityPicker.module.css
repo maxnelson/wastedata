@@ -5,67 +5,32 @@
   max-width: 100%;
 }
 
-/* ─── Trigger button — styled as the big bold city h1 ───── */
-.trigger {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-  padding: 12px 14px 12px 14px;
-  max-width: 100%;
+/* ─── City name as auto-growing search textarea ──────────── */
+.cityInput {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px 0;
   background: transparent;
-  border: 1.5px solid var(--gray-200);
-  border-radius: 10px;
-  cursor: pointer;
+  border: none;
+  border-bottom: 1.5px solid var(--gray-900);
+  outline: none;
+  resize: none;
+  overflow: hidden;
   font-family: var(--font-sans);
   font-size: var(--text-3xl);
   font-weight: 700;
   letter-spacing: -1.5px;
   color: var(--text-primary);
-  line-height: 1;
-  transition:
-    border-color var(--transition-fast),
-    background var(--transition-fast);
+  line-height: 1.15;
+  cursor: text;
 }
 
-.trigger:hover {
-  border-color: var(--gray-300);
-  background: var(--gray-50);
-}
-
-/* Placeholder state — city not yet chosen */
-.triggerEmpty {
-  border-style: dashed;
-  border-color: var(--gray-300);
-}
-
-.triggerEmpty .cityName {
+.cityInput::placeholder {
+  color: var(--text-primary);
   opacity: 0.35;
   font-weight: 600;
   letter-spacing: -0.5px;
-}
-
-/* ─── City name text ─────────────────────────────────────── */
-.cityName {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* ─── Trigger icons (search + chevron) ──────────────────── */
-.triggerIcons {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  color: var(--gray-400);
-  flex-shrink: 0;
-  /* Optically align with the baseline of the large text */
-  margin-top: 4px;
-  transition: color var(--transition-fast);
-}
-
-.trigger:hover .triggerIcons {
-  color: var(--gray-600);
 }
 
 /* ─── Dropdown ───────────────────────────────────────────── */
@@ -73,46 +38,14 @@
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-  min-width: 360px;
+  min-width: min(360px, 100%);
+  max-width: 100%;
   background: #fff;
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   overflow: hidden;
   z-index: 200;
-}
-
-/* ─── Search input row ───────────────────────────────────── */
-.searchWrapper {
-  position: relative;
-}
-
-.searchIcon {
-  position: absolute;
-  left: 11px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  color: var(--gray-400);
-  pointer-events: none;
-}
-
-.searchInput {
-  width: 100%;
-  padding: 11px 14px 11px 34px;
-  border: none;
-  border-bottom: 1px solid var(--gray-200);
-  font-size: var(--text-sm);
-  font-family: var(--font-sans);
-  color: var(--gray-900);
-  background: var(--gray-50);
-  outline: none;
-  box-sizing: border-box;
-}
-
-.searchInput::placeholder {
-  color: var(--gray-400);
 }
 
 /* ─── Result options ─────────────────────────────────────── */
@@ -147,6 +80,18 @@
 
 .optionDisabled {
   opacity: 0.4;
+}
+
+.optionSelected {
+  color: var(--gray-900);
+  font-weight: 600;
+}
+
+.optionCheck {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: #16a34a;
 }
 
 .optionName {

@@ -173,7 +173,11 @@ export default function Home({
           </span>
           <span className={styles.heroUnit}>lbs</span>
         </div>
-        <p className={styles.heroLabel}>per person · per day</p>
+        <p className={styles.heroLabel}>
+          <span className={styles.heroLabelPhrase}>per person</span>
+          {' · '}
+          <span className={styles.heroLabelPhrase}>per day</span>
+        </p>
         <div className={styles.heroAccentBar} />
       </div>
 
