@@ -6,6 +6,7 @@ import styles from "./Home.module.css";
 import { MOCK_DATA } from "../data/cities";
 import CityPicker from "../components/CityPicker";
 import DonutChart from "../components/Charts/DonutChart";
+import StateBarChart from "../components/Charts/StateBarChart";
 
 const STATE_NAMES = {
   AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',
@@ -56,36 +57,6 @@ const FALLBACK_CATEGORIES = [
   { name: "Glass", pct: 2 },
 ];
 
-// Stable mock YoY changes per category (computed once at module level, not in render)
-const YOY_CHANGES = [0.82, -1.43, 1.91, -0.67, 1.24];
-
-// Simulated quarterly bar heights (24 quarters = 2019 Q1 → 2024 Q4)
-const BAR_HEIGHTS = [
-  68,
-  74,
-  71,
-  65, // 2019
-  58,
-  42,
-  52,
-  60, // 2020 (COVID dip)
-  66,
-  72,
-  78,
-  75, // 2021
-  80,
-  83,
-  79,
-  77, // 2022
-  74,
-  71,
-  76,
-  73, // 2023
-  70,
-  68,
-  72,
-  69, // 2024
-];
 
 export default function Home({
   city = "Berkeley",
@@ -95,8 +66,6 @@ export default function Home({
   vsPerCapita = null,
 }) {
   const data = MOCK_DATA[city] || MOCK_DATA["Berkeley"];
-  const [activeTrend, setActiveTrend] = useState("quarterly");
-  const [hoveredBar, setHoveredBar] = useState(null);
 
   // Always show all-streams view (disposed + recycled + diverted)
   const charSource = data.residential || data.commercial;
@@ -170,80 +139,8 @@ export default function Home({
       {/* ── Donut — full content width ──────────────────── */}
       <DonutChart categories={CATEGORIES} />
 
-      {/* ── Charts ─────────────────────────────────────── */}
-      <div className={styles.chartsGrid}>
-
-        {/* Trend bars */}
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <div>
-              <h2 className={styles.cardTitle}>Disposal Trend</h2>
-              <p className={styles.cardSub}>Quarterly totals · 2019–2024</p>
-            </div>
-            <div className={styles.tabGroup}>
-              {["quarterly", "annual"].map((t) => (
-                <button
-                  key={t}
-                  className={`${styles.tab} ${activeTrend === t ? styles.tabActive : ""}`}
-                  onClick={() => setActiveTrend(t)}
-                >
-                  {t.charAt(0).toUpperCase() + t.slice(1)}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className={styles.barChart}>
-            <div className={styles.barGroup}>
-              {BAR_HEIGHTS.map((h, i) => (
-                <div
-                  key={i}
-                  className={`${styles.bar} ${hoveredBar === i ? styles.barHovered : ""}`}
-                  style={{ height: `${h}%` }}
-                  onMouseEnter={() => setHoveredBar(i)}
-                  onMouseLeave={() => setHoveredBar(null)}
-                  title={`Q${(i % 4) + 1} ${2019 + Math.floor(i / 4)}`}
-                />
-              ))}
-            </div>
-            <div className={styles.barAxisLine} />
-            <div className={styles.barAxis}>
-              {["2019", "2020", "2021", "2022", "2023", "2024"].map((y) => (
-                <span key={y} className={styles.axisLabel}>
-                  {y}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className={styles.yoyList}>
-            {CATEGORIES.slice(0, 5).map((cat, i) => {
-              const change = YOY_CHANGES[i];
-              const pos = change >= 0;
-              return (
-                <div key={cat.name} className={styles.yoyRow}>
-                  <span
-                    className={styles.yoySwatch}
-                    style={{ background: cat.color }}
-                  />
-                  <span className={styles.yoyName}>{cat.name}</span>
-                  <span
-                    className={`${styles.yoyChange} num`}
-                    style={{
-                      color: pos
-                        ? "var(--status-positive)"
-                        : "var(--status-negative)",
-                    }}
-                  >
-                    {pos ? "+" : ""}
-                    {change.toFixed(2)}%
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+      {/* ── State-wide per-capita ranking ───────────────── */}
+      <StateBarChart cityObj={cityObj} accentColor={accentColor} />
 
       {/* ── Page actions — intentionally at the bottom ──── */}
       <div className={styles.pageActions}>

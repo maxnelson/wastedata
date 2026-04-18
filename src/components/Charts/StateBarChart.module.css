@@ -1,0 +1,111 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 28px;
+}
+
+.hoverInfo {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  min-width: 0;
+}
+
+.hoverPlaceholder {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.stateSelect {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  background: transparent;
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.stateSelect:hover {
+  border-color: var(--gray-300);
+}
+
+/* ─── Scrollable chart area ──────────────────────────────── */
+.scrollContainer {
+  overflow-x: auto;
+  /* Hide scrollbar on browsers that support it, but keep functionality */
+  scrollbar-width: thin;
+  scrollbar-color: var(--gray-200) transparent;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  height: 4px;
+}
+
+.scrollContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb {
+  background: var(--gray-200);
+  border-radius: 2px;
+}
+
+.chartInner {
+  display: flex;
+  flex-direction: column;
+  min-width: max-content;
+}
+
+/* ─── Bars ───────────────────────────────────────────────── */
+.barTrack {
+  display: flex;
+  align-items: flex-end;
+  height: 160px;
+  gap: 1px;
+}
+
+.barCol {
+  width: 3px;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.bar {
+  width: 100%;
+  border-radius: 1px 1px 0 0;
+  background: var(--gray-300);
+  opacity: 0.55;
+  transition: opacity 0.1s;
+}
+
+.barSelected {
+  opacity: 1;
+}
+
+.barHovered {
+  opacity: 0.9;
+}
+
+.barSelected.barHovered {
+  opacity: 1;
+}
+
+.axisLine {
+  height: 1px;
+  background: var(--border-subtle);
+}
