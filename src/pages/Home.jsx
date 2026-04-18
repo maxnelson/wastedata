@@ -167,10 +167,7 @@ export default function Home({
         <div className={styles.heroAccentBar} />
       </div>
 
-      {/* ── Donut — full content width ──────────────────── */}
-      <DonutChart categories={CATEGORIES} />
-
-      {/* ── Legend — 2-col grid below donut ─────────────── */}
+      {/* ── Legend — above donut ────────────────────────── */}
       <div className={styles.legend}>
         {CATEGORIES.map((cat) => (
           <div key={cat.name} className={styles.legendRow}>
@@ -179,10 +176,12 @@ export default function Home({
               style={{ background: cat.color }}
             />
             <span className={styles.legendName}>{cat.name}</span>
-            <span className={`${styles.legendPct} num`}>{cat.pct}%</span>
           </div>
         ))}
       </div>
+
+      {/* ── Donut — full content width ──────────────────── */}
+      <DonutChart categories={CATEGORIES} />
 
       {/* ── Charts ─────────────────────────────────────── */}
       <div className={styles.chartsGrid}>

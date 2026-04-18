@@ -59,7 +59,7 @@ export default function DonutChart({ categories }) {
         key={cat.name}
         d={d}
         fill={cat.color}
-        stroke={isSelected ? 'white' : 'none'}
+        stroke={isSelected ? '#ffe033' : 'none'}
         strokeWidth={isSelected ? 3 : 0}
         className={`${styles.segment} ${isSelected ? styles.segmentSelected : ''}`}
         transform={isSelected ? `translate(${dx}, ${dy})` : undefined}

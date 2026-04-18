@@ -4,12 +4,10 @@
 
 .segment {
   cursor: pointer;
-  transition: transform 0.18s ease, filter 0.18s ease;
+  transition: transform 0.18s ease;
 }
 
-.segmentSelected {
-  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.28));
-}
+.segmentSelected {}
 
 .centerPct {
   font-family: var(--font-sans);
