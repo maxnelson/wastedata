@@ -5,6 +5,7 @@ import { faTrashCan } from "@fortawesome/pro-regular-svg-icons";
 import styles from "./Home.module.css";
 import { MOCK_DATA } from "../data/cities";
 import CityPicker from "../components/CityPicker";
+import DonutChart from "../components/Charts/DonutChart";
 
 const STATE_NAMES = {
   AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',
@@ -54,17 +55,6 @@ const FALLBACK_CATEGORIES = [
   { name: "Special Waste", pct: 3 },
   { name: "Glass", pct: 2 },
 ];
-
-// Build conic-gradient stops from pct values
-function buildConicGradient(cats) {
-  let deg = 0;
-  const stops = cats.map((c) => {
-    const start = deg;
-    deg += (c.pct / 100) * 360;
-    return `${c.color} ${start.toFixed(1)}deg ${deg.toFixed(1)}deg`;
-  });
-  return `conic-gradient(${stops.join(", ")})`;
-}
 
 // Stable mock YoY changes per category (computed once at module level, not in render)
 const YOY_CHANGES = [0.82, -1.43, 1.91, -0.67, 1.24];
@@ -177,36 +167,25 @@ export default function Home({
         <div className={styles.heroAccentBar} />
       </div>
 
+      {/* ── Donut — full content width ──────────────────── */}
+      <DonutChart categories={CATEGORIES} />
+
+      {/* ── Legend — 2-col grid below donut ─────────────── */}
+      <div className={styles.legend}>
+        {CATEGORIES.map((cat) => (
+          <div key={cat.name} className={styles.legendRow}>
+            <span
+              className={styles.legendSwatch}
+              style={{ background: cat.color }}
+            />
+            <span className={styles.legendName}>{cat.name}</span>
+            <span className={`${styles.legendPct} num`}>{cat.pct}%</span>
+          </div>
+        ))}
+      </div>
+
       {/* ── Charts ─────────────────────────────────────── */}
       <div className={styles.chartsGrid}>
-        {/* Composition donut — no card wrapper, sits bare in the grid */}
-        <div>
-          <div className={styles.donutWrap}>
-            <div
-              className={styles.donutRing}
-              style={{ background: buildConicGradient(CATEGORIES) }}
-            />
-            <div className={styles.donutCenter}>
-              <span className={`${styles.donutValue} num`}>
-                {Math.round(data.q1Total2024).toLocaleString()}
-              </span>
-              <span className={styles.donutUnit}>tons disposed</span>
-            </div>
-          </div>
-
-          <div className={styles.legend}>
-            {CATEGORIES.map((cat) => (
-              <div key={cat.name} className={styles.legendRow}>
-                <span
-                  className={styles.legendSwatch}
-                  style={{ background: cat.color }}
-                />
-                <span className={styles.legendName}>{cat.name}</span>
-                <span className={`${styles.legendPct} num`}>{cat.pct}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Trend bars */}
         <div className={styles.card}>

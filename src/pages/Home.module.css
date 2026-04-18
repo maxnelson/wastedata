@@ -193,7 +193,7 @@
 /* ─── Charts grid ───────────────────────────────────────── */
 .chartsGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: var(--space-6);
   align-items: start;
 }
@@ -258,53 +258,11 @@
   box-shadow: var(--shadow-xs);
 }
 
-/* ─── Donut chart ───────────────────────────────────────── */
-.donutWrap {
-  position: relative;
-  width: 188px;
-  height: 188px;
-  margin: 0 auto var(--space-6);
-}
-
-.donutRing {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  mask: radial-gradient(transparent 58px, black 58px);
-  -webkit-mask: radial-gradient(transparent 58px, black 58px);
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.12));
-}
-
-.donutCenter {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  pointer-events: none;
-}
-
-.donutValue {
-  display: block;
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.5px;
-  line-height: 1.2;
-}
-
-.donutUnit {
-  display: block;
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-
 /* ─── Legend ────────────────────────────────────────────── */
 .legend {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 24px;
 }
 
 .legendRow {
