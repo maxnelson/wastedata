@@ -105,15 +105,11 @@ export default function Home({
   vsPerCapita = null,
 }) {
   const data = MOCK_DATA[city] || MOCK_DATA["Berkeley"];
-  const [activeTab, setActiveTab] = useState("disposed");
   const [activeTrend, setActiveTrend] = useState("quarterly");
   const [hoveredBar, setHoveredBar] = useState(null);
 
-  // Build category list from real characterization data if available
-  const charSource =
-    activeTab === "disposed"
-      ? data.commercial
-      : data.residential || data.commercial;
+  // Always show all-streams view (disposed + recycled + diverted)
+  const charSource = data.residential || data.commercial;
   const CATEGORIES = charSource
     ? CATEGORY_ORDER.map((name) => ({
         name,
@@ -183,26 +179,8 @@ export default function Home({
 
       {/* ── Charts ─────────────────────────────────────── */}
       <div className={styles.chartsGrid}>
-        {/* Composition donut */}
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <div>
-              <h2 className={styles.cardTitle}>Material Composition</h2>
-              <p className={styles.cardSub}>By disposed weight · Q1 2024</p>
-            </div>
-            <div className={styles.tabGroup}>
-              {["disposed", "all-streams"].map((t) => (
-                <button
-                  key={t}
-                  className={`${styles.tab} ${activeTab === t ? styles.tabActive : ""}`}
-                  onClick={() => setActiveTab(t)}
-                >
-                  {t === "disposed" ? "Disposed" : "All Streams"}
-                </button>
-              ))}
-            </div>
-          </div>
-
+        {/* Composition donut — no card wrapper, sits bare in the grid */}
+        <div>
           <div className={styles.donutWrap}>
             <div
               className={styles.donutRing}
