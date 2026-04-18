@@ -6,6 +6,19 @@ import styles from "./Home.module.css";
 import { MOCK_DATA } from "../data/cities";
 import CityPicker from "../components/CityPicker";
 
+const STATE_NAMES = {
+  AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',
+  CO:'Colorado',CT:'Connecticut',DE:'Delaware',FL:'Florida',GA:'Georgia',
+  HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',
+  KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',
+  MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',
+  MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',
+  NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',
+  OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',
+  SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',
+  VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',
+}
+
 // Color palette for material categories — matches var(--cat-*) tokens
 const CATEGORY_COLORS = {
   Organic: "#52b788",
@@ -130,8 +143,7 @@ export default function Home({
       {/* ── City header ────────────────────────────────── */}
       <div className={styles.cityHeader}>
         <p className={styles.breadcrumb}>
-          {data.county ? `${data.county} County` : ""}
-          {cityObj?.state ? ` · ${cityObj.state}` : ""}
+          {cityObj?.state ? (STATE_NAMES[cityObj.state] ?? cityObj.state) : ""}
         </p>
         <div className={styles.cityNameRow}>
           <CityPicker
