@@ -4,54 +4,45 @@ import styles from './StateBarChart.module.css'
 
 const STATE_NAMES = {
   CA: 'California',
-  // additional states will populate here as data is added
 }
 
-// Derive available states from data keys (currently all CA)
 const AVAILABLE_STATES = [...new Set(Object.keys(MOCK_DATA).map(() => 'CA'))]
 
-// Build and sort all cities by perCapita descending — done once at module level
-const ALL_CITIES = Object.entries(MOCK_DATA)
+// Per-capita ranking — sorted highest to lowest
+const CITIES_BY_CAPITA = Object.entries(MOCK_DATA)
   .filter(([, d]) => d.perCapita != null)
   .sort(([, a], [, b]) => b.perCapita - a.perCapita)
   .map(([name, d]) => ({ name, ...d }))
 
-const MAX_VAL = ALL_CITIES[0]?.perCapita ?? 1
+const MAX_CAPITA = CITIES_BY_CAPITA[0]?.perCapita ?? 1
 
-/**
- * StateBarChart
- *
- * Horizontally scrollable bar chart showing per-capita waste (lbs/person/day)
- * for every city in the selected state, sorted highest to lowest.
- * The currently selected city is highlighted in the panel's accent color.
- *
- * Props:
- *   cityObj     — { city, state, key } | null
- *   accentColor — CSS color string for the highlighted bar
- */
+// Total volume ranking — sorted highest to lowest
+const CITIES_BY_VOLUME = Object.entries(MOCK_DATA)
+  .filter(([, d]) => d.q1Total2024 != null)
+  .sort(([, a], [, b]) => b.q1Total2024 - a.q1Total2024)
+  .map(([name, d]) => ({ name, ...d }))
+
+const MAX_VOLUME = CITIES_BY_VOLUME[0]?.q1Total2024 ?? 1
+
 export default function StateBarChart({ cityObj, accentColor = 'var(--accent-color)' }) {
   const [selectedState, setSelectedState] = useState(cityObj?.state ?? 'CA')
+  const [mode, setMode]                   = useState('perCapita')
   const [hoveredCity, setHoveredCity]     = useState(null)
 
-  // When cityObj changes city (panel navigates), keep state in sync
   const effectiveState = cityObj?.state ?? selectedState
+  const selectedName   = cityObj?.city ?? null
+
+  const sourceList = mode === 'perCapita' ? CITIES_BY_CAPITA : CITIES_BY_VOLUME
+  const maxVal     = mode === 'perCapita' ? MAX_CAPITA : MAX_VOLUME
 
   const cities = useMemo(
-    () => ALL_CITIES.filter(() => effectiveState === 'CA'), // expand when multi-state data lands
-    [effectiveState]
+    () => sourceList.filter(() => effectiveState === 'CA'),
+    [sourceList, effectiveState]
   )
-
-  const selectedName = cityObj?.city ?? null
 
   return (
     <div className={styles.section}>
       <div className={styles.header}>
-        <div className={styles.hoverInfo}>
-          {hoveredCity
-            ? <><strong>{hoveredCity.name}</strong> — {hoveredCity.perCapita} lbs/person/day</>
-            : <span className={styles.hoverPlaceholder}>Hover a bar to see city details</span>
-          }
-        </div>
         <select
           className={styles.stateSelect}
           value={selectedState}
@@ -61,6 +52,21 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
             <option key={s} value={s}>{STATE_NAMES[s] ?? s}</option>
           ))}
         </select>
+
+        <div className={styles.tabGroup}>
+          <button
+            className={`${styles.tab} ${mode === 'perCapita' ? styles.tabActive : ''}`}
+            onClick={() => setMode('perCapita')}
+          >
+            Per Capita
+          </button>
+          <button
+            className={`${styles.tab} ${mode === 'volume' ? styles.tabActive : ''}`}
+            onClick={() => setMode('volume')}
+          >
+            Total Volume
+          </button>
+        </div>
       </div>
 
       <div className={styles.scrollContainer}>
@@ -69,17 +75,23 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
             {cities.map(city => {
               const isSelected = city.name === selectedName
               const isHovered  = hoveredCity?.name === city.name
-              const heightPct  = (city.perCapita / MAX_VAL) * 100
+              const val        = mode === 'perCapita' ? city.perCapita : city.q1Total2024
+              const heightPct  = val != null ? (val / maxVal) * 100 : 0
 
               return (
                 <div
                   key={city.name}
                   className={styles.barCol}
+                  title={
+                    mode === 'perCapita'
+                      ? `${city.name}: ${city.perCapita} lbs/person/day`
+                      : `${city.name}: ${Math.round(city.q1Total2024).toLocaleString()} tons`
+                  }
                   onMouseEnter={() => setHoveredCity(city)}
                   onMouseLeave={() => setHoveredCity(null)}
                 >
                   <div
-                    className={`${styles.bar} ${isSelected ? styles.barSelected : ''} ${isHovered ? styles.barHovered : ''}`}
+                    className={`${styles.bar} ${isSelected ? styles.barSelected : ''} ${isHovered && !isSelected ? styles.barHovered : ''}`}
                     style={{
                       height: `${heightPct}%`,
                       background: isSelected ? accentColor : undefined,
