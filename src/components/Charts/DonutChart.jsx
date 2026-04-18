@@ -60,7 +60,7 @@ export default function DonutChart({ categories }) {
         d={d}
         fill={cat.color}
         stroke={isSelected ? '#ffe033' : 'none'}
-        strokeWidth={isSelected ? 3 : 0}
+        strokeWidth={isSelected ? 5 : 0}
         className={`${styles.segment} ${isSelected ? styles.segmentSelected : ''}`}
         transform={isSelected ? `translate(${dx}, ${dy})` : undefined}
         onClick={() => setSelectedIdx(isSelected ? null : i)}
@@ -74,6 +74,7 @@ export default function DonutChart({ categories }) {
     <svg
       viewBox="0 0 400 400"
       width="100%"
+      overflow="visible"
       style={{ display: 'block' }}
       className={styles.donut}
     >

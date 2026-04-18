@@ -261,14 +261,14 @@
 /* ─── Legend ────────────────────────────────────────────── */
 .legend {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: 8px 20px;
 }
 
 .legendRow {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
 .legendSwatch {
