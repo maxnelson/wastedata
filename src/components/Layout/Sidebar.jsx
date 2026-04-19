@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import styles from './Sidebar.module.css'
+import { useFilter } from '../../contexts/FilterContext'
 
 const YEARS = [2025, 2024, 2023, 2022, 2021, 2020, 2019]
 const QUARTERS = ['Q1', 'Q2', 'Q3', 'Q4']
@@ -9,8 +9,7 @@ function SectionLabel({ children, style }) {
 }
 
 export default function Sidebar() {
-  const [year,    setYear]    = useState(2024)
-  const [quarter, setQuarter] = useState('Q1')
+  const { year, quarter, setYear, setQuarter } = useFilter()
 
   return (
     <aside className={styles.sidebar}>

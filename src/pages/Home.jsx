@@ -2,7 +2,8 @@ import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/pro-regular-svg-icons";
 import styles from "./Home.module.css";
-import { MOCK_DATA } from "../data/cities";
+import { MOCK_DATA, getDisposalRecord, computePerCapita } from "../data/cities";
+import { useFilter } from "../contexts/FilterContext";
 import CityPicker from "../components/CityPicker";
 import DonutChart from "../components/Charts/DonutChart";
 import StateBarChart from "../components/Charts/StateBarChart";
@@ -64,7 +65,13 @@ export default function Home({
   excludeCity,
   vsPerCapita = null,
 }) {
+  const { year, quarter } = useFilter()
+  const qNum = parseInt(quarter.replace('Q', ''), 10)
+
   const data = MOCK_DATA[city] || MOCK_DATA["Berkeley"];
+  const disposalRecord = getDisposalRecord(city, year, qNum)
+  const livePerCapita = computePerCapita(city, year, disposalRecord)
+  const liveTons = disposalRecord?.total ?? null
 
   // Always show all-streams view (disposed + recycled + diverted)
   const charSource = data.residential || data.commercial;
@@ -81,8 +88,8 @@ export default function Home({
 
   // Performance color: compare against the other city if in comparison mode
   let perf = null;
-  if (vsPerCapita !== null) {
-    perf = data.perCapita <= vsPerCapita ? "better" : "worse";
+  if (vsPerCapita !== null && livePerCapita !== null) {
+    perf = livePerCapita <= vsPerCapita ? "better" : "worse";
   }
 
   const accentColor =
@@ -110,11 +117,9 @@ export default function Home({
           <p className={styles.cityMeta}>
             {data.pop2024 ? `Population ${data.pop2024.toLocaleString()}` : ""}
           </p>
-          {data.q1Total2024 && (
-            <p className={styles.cityMeta}>
-              {Math.round(data.q1Total2024).toLocaleString()} tons
-            </p>
-          )}
+          <p className={styles.cityMeta}>
+            {liveTons != null ? `${Math.round(liveTons).toLocaleString()} tons` : '—'}
+          </p>
         </div>
       </div>
 
@@ -123,7 +128,7 @@ export default function Home({
         <div className={styles.heroNum}>
           <span className={styles.heroLockup}>
             <FontAwesomeIcon icon={faTrashCan} className={styles.heroIcon} />
-            <span className={`${styles.heroValue} num`}>{data.perCapita}</span>
+            <span className={`${styles.heroValue} num`}>{livePerCapita ?? '—'}</span>
           </span>
           <span className={styles.heroUnit}>lbs</span>
         </div>

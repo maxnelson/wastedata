@@ -6,6 +6,7 @@ import Layout from './components/Layout/Layout'
 import Home from './pages/Home'
 import { MOCK_DATA } from './data/cities'
 import { segmentToCityObj, cityObjToSegment, randomCityPair } from './utils/cityUrl'
+import { FilterProvider } from './contexts/FilterContext'
 import styles from './App.module.css'
 
 /** Picks two random cities and redirects immediately. */
@@ -39,6 +40,7 @@ function CompareView() {
     <div className={styles.root}>
       <AppHeader />
       <div className={styles.body}>
+        <FilterProvider>
         <Layout>
           <div className={`${styles.panels} ${styles.comparing}`}>
             <div className={styles.panelA}>
@@ -61,6 +63,7 @@ function CompareView() {
             </div>
           </div>
         </Layout>
+        </FilterProvider>
       </div>
       <Footer />
     </div>

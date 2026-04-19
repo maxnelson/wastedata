@@ -1,51 +1,56 @@
 import { useState, useMemo } from 'react'
-import { MOCK_DATA } from '../../data/cities'
+import { disposalByJurisdiction, populationData } from '../../data/cities'
+import { useFilter } from '../../contexts/FilterContext'
 import styles from './StateBarChart.module.css'
 
 const STATE_NAMES = {
   CA: 'California',
 }
 
-const AVAILABLE_STATES = [...new Set(Object.keys(MOCK_DATA).map(() => 'CA'))]
-
-// Per-capita ranking — sorted highest to lowest
-const CITIES_BY_CAPITA = Object.entries(MOCK_DATA)
-  .filter(([, d]) => d.perCapita != null)
-  .sort(([, a], [, b]) => b.perCapita - a.perCapita)
-  .map(([name, d]) => ({ name, ...d }))
-
-const MAX_CAPITA = CITIES_BY_CAPITA[0]?.perCapita ?? 1
-
-// Total volume ranking — sorted highest to lowest
-const CITIES_BY_VOLUME = Object.entries(MOCK_DATA)
-  .filter(([, d]) => d.q1Total2024 != null)
-  .sort(([, a], [, b]) => b.q1Total2024 - a.q1Total2024)
-  .map(([name, d]) => ({ name, ...d }))
-
-const MAX_VOLUME = CITIES_BY_VOLUME[0]?.q1Total2024 ?? 1
+const AVAILABLE_STATES = ['CA']
 
 export default function StateBarChart({ cityObj, accentColor = 'var(--accent-color)' }) {
   const [selectedState, setSelectedState] = useState(cityObj?.state ?? 'CA')
   const [mode, setMode]                   = useState('perCapita')
   const [hoveredCity, setHoveredCity]     = useState(null)
 
+  const { year, quarter } = useFilter()
+  const qNum = parseInt(quarter.replace('Q', ''), 10)
+
   const effectiveState = cityObj?.state ?? selectedState
   const selectedName   = cityObj?.city ?? null
 
-  const displayCity = hoveredCity ?? (selectedName ? MOCK_DATA[selectedName] && { name: selectedName, ...MOCK_DATA[selectedName] } : null)
+  const cities = useMemo(() => {
+    const entries = []
+
+    for (const [name, records] of Object.entries(disposalByJurisdiction)) {
+      if (effectiveState !== 'CA') continue
+
+      const record = records.find(r => r.year === year && r.quarter === qNum)
+      if (!record || record.total == null) continue
+
+      if (mode === 'perCapita') {
+        const pop = populationData[name]?.pop?.[String(year)]
+        if (!pop) continue
+        const perCapita = +((record.total * 2000) / 91.25 / pop).toFixed(2)
+        entries.push({ name, value: perCapita, total: record.total })
+      } else {
+        entries.push({ name, value: record.total, total: record.total })
+      }
+    }
+
+    entries.sort((a, b) => b.value - a.value)
+    return entries
+  }, [year, qNum, mode, effectiveState])
+
+  const maxVal = cities[0]?.value ?? 1
+
+  const displayCity = hoveredCity ?? (selectedName ? cities.find(c => c.name === selectedName) ?? null : null)
   const hoverLabel  = displayCity
     ? mode === 'perCapita'
-      ? `${displayCity.name} — ${displayCity.perCapita} lbs/person/day`
-      : `${displayCity.name} — ${Math.round(displayCity.q1Total2024).toLocaleString()} tons`
+      ? `${displayCity.name} — ${displayCity.value} lbs/person/day`
+      : `${displayCity.name} — ${Math.round(displayCity.value).toLocaleString()} tons`
     : null
-
-  const sourceList = mode === 'perCapita' ? CITIES_BY_CAPITA : CITIES_BY_VOLUME
-  const maxVal     = mode === 'perCapita' ? MAX_CAPITA : MAX_VOLUME
-
-  const cities = useMemo(
-    () => sourceList.filter(() => effectiveState === 'CA'),
-    [sourceList, effectiveState]
-  )
 
   return (
     <div className={styles.section}>
@@ -81,11 +86,12 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
       <div className={styles.scrollContainer}>
         <div className={styles.chartInner}>
           <div className={styles.barTrack}>
-            {cities.map(city => {
+            {cities.length === 0 ? (
+              <div className={styles.noData}>No data for {quarter} {year}</div>
+            ) : cities.map(city => {
               const isSelected = city.name === selectedName
               const isHovered  = hoveredCity?.name === city.name
-              const val        = mode === 'perCapita' ? city.perCapita : city.q1Total2024
-              const heightPct  = val != null ? (val / maxVal) * 100 : 0
+              const heightPct  = (city.value / maxVal) * 100
 
               return (
                 <div
@@ -93,8 +99,8 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
                   className={styles.barCol}
                   title={
                     mode === 'perCapita'
-                      ? `${city.name}: ${city.perCapita} lbs/person/day`
-                      : `${city.name}: ${Math.round(city.q1Total2024).toLocaleString()} tons`
+                      ? `${city.name}: ${city.value} lbs/person/day`
+                      : `${city.name}: ${Math.round(city.value).toLocaleString()} tons`
                   }
                   onMouseEnter={() => setHoveredCity(city)}
                   onMouseLeave={() => setHoveredCity(null)}

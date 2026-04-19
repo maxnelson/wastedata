@@ -98,6 +98,16 @@
   min-width: max-content;
 }
 
+.noData {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 160px;
+  width: 100%;
+  color: var(--text-3);
+  font-size: 0.8125rem;
+}
+
 /* ─── Bars ───────────────────────────────────────────────── */
 .barTrack {
   display: flex;
