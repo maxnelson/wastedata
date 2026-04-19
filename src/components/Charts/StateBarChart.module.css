@@ -21,7 +21,6 @@
   margin-top: calc(var(--space-3) * -0.5);
 }
 
-
 .stateSelect {
   padding: 4px 8px;
   border: 1px solid var(--gray-200);
@@ -108,6 +107,88 @@
   font-size: 0.8125rem;
 }
 
+/* ─── Scale row ──────────────────────────────────────────── */
+.scaleRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.scaleLabel {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ─── Chart area (wraps scroll + badges) ─────────────────── */
+.chartArea {
+  position: relative;
+}
+
+.scaleBadge,
+.brushBadge {
+  position: absolute;
+  top: 4px;
+  z-index: 1;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: 2px 6px;
+  pointer-events: none;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.scaleBadge { left: 4px; }
+.brushBadge { right: 4px; }
+
+/* ─── Mini overview chart ────────────────────────────────── */
+.miniChartWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+}
+
+.miniChartHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.miniChartLabel {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.miniChart {
+  display: block;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  cursor: crosshair;
+  user-select: none;
+}
+
+.brushClear {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 4px;
+  font-family: var(--font-sans);
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.brushClear:hover {
+  opacity: 1;
+}
+
 /* ─── Bars ───────────────────────────────────────────────── */
 .barTrack {
   display: flex;
@@ -117,7 +198,7 @@
 }
 
 .barCol {
-  width: 3px;
+  width: 15px;
   height: 100%;
   display: flex;
   align-items: flex-end;
@@ -126,12 +207,23 @@
 }
 
 .bar {
+  position: relative;
   width: 100%;
   border-radius: 1px 1px 0 0;
   background: var(--gray-300); /* fallback; inline style overrides with city color */
   opacity: 0.45;
-  /* Animate height when switching modes */
   transition: height 0.35s ease, opacity 0.15s ease;
+}
+
+.overflowIndicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gray-600);
+  border-radius: 1px 1px 0 0;
+  opacity: 0.8;
 }
 
 .barSelected {

@@ -1,82 +1,68 @@
-# CLAUDE.md — TrashData California Waste Management Dashboard
+# CLAUDE.md
 
-## Project Overview
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-A web application that visualizes waste management data for California cities and counties. Shows waste disposal volumes, material composition breakdowns, per-capita waste generation, and city-to-city comparisons. Inspired by the original trashdata.net project (see mockups in `docs/mockups/`).
+## TrashData — California Waste Management Dashboard
 
-## Tech Stack
+A React web app that visualizes CalRecycle waste disposal data for all ~419 California jurisdictions. Shows per-capita disposal rates, material composition breakdowns, and side-by-side city comparisons. Inspired by trashdata.net (design mockups in `docs/mockups/`).
 
-- **Build:** Vite
-- **UI:** React 18+
-- **Charts:** D3.js (chosen for pixel-perfect control over custom donut charts, tooltips, and interactions)
-- **Styling:** TBD (CSS Modules or Tailwind)
-- **Routing:** React Router v6
-- **Hosting:** Firebase Hosting (planned)
-- **Data Storage:** Static JSON for MVP, possible Firebase/Firestore later
-
-## Project Structure
-
-```
-wastedata/                              ← project root (web app root)
-├── src/                                ← Vite + React source (to be scaffolded)
-│   ├── components/
-│   │   ├── Charts/
-│   │   ├── Controls/
-│   │   ├── Layout/
-│   │   └── Comparison/
-│   ├── pages/
-│   ├── hooks/
-│   ├── utils/
-│   └── main.jsx
-├── public/
-├── data/
-│   ├── raw/                            ← source files, never modified after download
-│   │   ├── disposal-tonnage/           ← CalRecycle quarterly disposal xlsx (2019–2025)
-│   │   └── waste-characterization/     ← CalRecycle waste composition xlsx
-│   │       ├── counties.json
-│   │       └── {county}/
-│   │           ├── commercial/         ← {city}_commercial.xlsx
-│   │           ├── residential/        ← {city}_residential.xlsx
-│   │           └── business-groups/    ← {city}_business-groups.xlsx
-│   └── processed/                      ← JSON output from transformation pipeline
-│       ├── jurisdictions.json
-│       ├── disposal/
-│       └── characterization/
-├── tools/
-│   ├── data_extraction/                ← CalRecycle downloaders (Node.js)
-│   │   ├── fetch-calrecycle-waste-characterization.js
-│   │   └── README.md
-│   ├── data_transformation/            ← xlsx → JSON (Python, to be built)
-│   └── data_validation/                ← cross-checks (Python, to be built)
-├── docs/
-│   ├── mockups/                        ← trashdata.net design reference screenshots
-│   └── dev-notes/                      ← HAR captures, handoff notes
-├── package.json                        ← single package.json; tool deps under devDependencies
-├── node_modules/
-├── index.html                          ← Vite entry (to be created)
-└── vite.config.js                      ← (to be created)
-```
-
-## Running the Data Extraction Tools
+## Commands
 
 ```bash
-# From project root — uses the npm script alias
-npm run fetch:waste-characterization -- "Alameda"
-npm run fetch:waste-characterization -- "Alameda" --residential
-npm run fetch:waste-characterization -- --discover
+npm run dev          # Vite dev server (http://localhost:5173)
+npm run build        # Production build → dist/
+npm run preview      # Serve the production build locally
+npm run lint         # ESLint
 
-# Or run directly
-node tools/data_extraction/fetch-calrecycle-waste-characterization.js "Alameda"
-node tools/data_extraction/fetch-calrecycle-waste-characterization.js --discover
+# Data tools
+npm run fetch:waste-characterization -- "Alameda"   # Download CalRecycle waste characterization xlsx
+npm run fetch:waste-characterization -- --discover  # List all available counties
+npm run gen:city-colors                             # Regenerate src/styles/cityPalette.js and src/data/cityColorMap.js
 ```
 
-**Note on module types:** When Vite is scaffolded (which adds `"type": "module"` to package.json), rename the fetch script from `.js` to `.cjs` so Node continues to treat it as CommonJS.
+**Module type note:** `package.json` uses `"type": "module"`. The CalRecycle fetch script is `.cjs` to stay CommonJS.
 
-## Routing (planned)
+## Architecture
 
-- `/` — Home / city selector
-- `/city/:slug` — Single city dashboard
-- `/compare/:city1/:city2` — City comparison
+### Routing
+Only one active route: `/compare/:slugA/:slugB`. The root `/` immediately redirects to a random city pair. City identity lives entirely in the URL — no city state in React context.
+
+URL segment format: `"san-francisco-ca"` (slug + state suffix). `src/utils/cityUrl.js` handles encode/decode.
+
+### Data flow
+```
+data/processed/jurisdictions.json     ← master jurisdiction registry
+data/processed/disposal/by_jurisdiction.json  ← quarterly tonnage per city
+data/processed/population.json        ← annual population estimates
+        ↓
+src/data/cities.js                    ← imports all three, exports MOCK_DATA,
+                                         disposalByJurisdiction, populationData,
+                                         CITY_DATA (keyed "CityName|CA"), helpers
+        ↓
+Home.jsx / StateBarChart.jsx          ← compute derived values (per-capita, totals) on render
+```
+
+Per-capita formula: `(tons × 2000 lbs/ton) / 91.25 days / population` — produces lbs/person/day for a quarter.
+
+### Global state
+`FilterContext` (year + quarter) is the only shared state. Everything else is local component state or URL-derived.
+
+### Styling
+CSS Modules for all components. Design tokens (colors, spacing, typography, shadows, layout dimensions) live in `src/styles/tokens.css` and are referenced as CSS variables everywhere.
+
+### City color system
+`src/styles/cityPalette.js` — 400 color tokens (20 hues × 20 shades, named `cyan_01`…`sand_20`).
+`src/data/cityColorMap.js` — static mapping of `"CityName|CA"` → palette token + `getCityColor()` helper.
+
+**Both files are auto-generated** by `npm run gen:city-colors` (runs `tools/data_transformation/build_city_color_map.py`). Regenerate and commit whenever `jurisdictions.json` gains new entries. Do not edit them by hand.
+
+### Charts
+Charts are built with SVG and CSS — no D3 runtime dependency despite the tech-stack intention. `DonutChart.jsx` uses SVG arcs computed manually. `StateBarChart.jsx` uses CSS flex + inline `height` percentages.
+
+## Active routes
+
+- `/` → redirects to random city pair
+- `/compare/:slugA/:slugB` — side-by-side city comparison (the only real page)
 
 ## Data Sources
 
@@ -135,16 +121,16 @@ node tools/data_extraction/fetch-calrecycle-waste-characterization.js --discover
 
 ## Current Status
 
-- [x] Data sources understood and documented
+- [x] Vite + React app scaffolded and running
+- [x] City comparison view (`/compare/:slugA/:slugB`) built
+- [x] DonutChart (material breakdown) built
+- [x] StateBarChart (all-CA jurisdictions, per-capita + total volume modes) built
 - [x] CalRecycle disposal tonnage files acquired (2019–2025)
-- [x] Waste characterization downloader built and debugged (`fetch-calrecycle-waste-characterization.js`)
-- [x] Alameda County downloaded — all 16 jurisdictions, commercial + residential
-- [x] Project restructured as web app root with proper data/tools/src layout
+- [x] Waste characterization downloader built (`fetch-calrecycle-waste-characterization.cjs`)
+- [x] Alameda County waste characterization downloaded (16 jurisdictions, commercial + residential)
+- [x] Per-city color palette system built (`npm run gen:city-colors`)
 - [ ] Download remaining 57 counties (waste characterization)
 - [ ] Acquire CA DOF population data
-- [ ] Build data transformation pipeline (xlsx → JSON into `data/processed/`)
-- [ ] Scaffold Vite + React (run `npm create vite@latest . -- --template react`)
-- [ ] Build core components (DonutChart first)
-- [ ] Wire up single city dashboard
-- [ ] Build comparison view
-- [ ] Polish and deploy
+- [ ] Build data transformation pipeline for remaining counties
+- [ ] Wire up single-city dashboard route (`/city/:slug`)
+- [ ] Polish and deploy to Firebase Hosting
