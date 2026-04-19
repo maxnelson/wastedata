@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { disposalByJurisdiction, populationData } from '../../data/cities'
 import { useFilter } from '../../contexts/FilterContext'
+import { getCityColor } from '../../data/cityColorMap'
 import styles from './StateBarChart.module.css'
 
 const STATE_NAMES = {
@@ -109,7 +110,7 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
                     className={`${styles.bar} ${isSelected ? styles.barSelected : ''} ${isHovered && !isSelected ? styles.barHovered : ''}`}
                     style={{
                       height: `${heightPct}%`,
-                      background: isSelected ? accentColor : undefined,
+                      background: isSelected ? accentColor : getCityColor(`${city.name}|CA`),
                     }}
                   />
                 </div>

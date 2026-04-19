@@ -128,8 +128,8 @@
 .bar {
   width: 100%;
   border-radius: 1px 1px 0 0;
-  background: var(--gray-300);
-  opacity: 0.5;
+  background: var(--gray-300); /* fallback; inline style overrides with city color */
+  opacity: 0.45;
   /* Animate height when switching modes */
   transition: height 0.35s ease, opacity 0.15s ease;
 }
