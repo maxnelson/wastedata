@@ -16,6 +16,19 @@ export const CITY_DATA = Object.fromEntries(
 // Fast O(1) lookup: does this app have data for a given "City|STATE" key?
 export const CITY_KEYS = new Set(Object.keys(CITY_DATA))
 
+// Map of year → Set of quarter numbers that have at least one disposal record.
+// Used by the Sidebar to disable pill buttons for unavailable periods.
+export const quartersWithData = (() => {
+  const map = {}
+  for (const records of Object.values(disposalByJurisdiction)) {
+    for (const r of records) {
+      if (!map[r.year]) map[r.year] = new Set()
+      map[r.year].add(r.quarter)
+    }
+  }
+  return map
+})()
+
 // Returns the disposal record for a city/year/quarter, or null if missing.
 export function getDisposalRecord(cityName, year, quarter) {
   const records = disposalByJurisdiction[cityName]
@@ -24,10 +37,13 @@ export function getDisposalRecord(cityName, year, quarter) {
 }
 
 // Compute per-capita lbs/person/day for a given disposal record + city + year.
+// Falls back to 2020 population when the requested year isn't in the dataset (e.g. 2019).
 // Returns null if data is missing.
 export function computePerCapita(cityName, year, disposalRecord) {
   if (!disposalRecord) return null
-  const pop = populationData[cityName]?.pop?.[String(year)]
+  const popYears = populationData[cityName]?.pop
+  if (!popYears) return null
+  const pop = popYears[String(year)] ?? popYears['2020']
   if (!pop) return null
   // total is in tons; convert to lbs, divide by days in a quarter (~91.25)
   return +((disposalRecord.total * 2000) / 91.25 / pop).toFixed(2)

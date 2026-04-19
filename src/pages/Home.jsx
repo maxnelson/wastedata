@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/pro-regular-svg-icons";
 import styles from "./Home.module.css";
-import { MOCK_DATA, getDisposalRecord, computePerCapita } from "../data/cities";
+import { MOCK_DATA, getDisposalRecord, computePerCapita, populationData } from "../data/cities";
 import { useFilter } from "../contexts/FilterContext";
 import CityPicker from "../components/CityPicker";
 import DonutChart from "../components/Charts/DonutChart";
@@ -72,6 +72,8 @@ export default function Home({
   const disposalRecord = getDisposalRecord(city, year, qNum)
   const livePerCapita = computePerCapita(city, year, disposalRecord)
   const liveTons = disposalRecord?.total ?? null
+  const popYears = populationData[city]?.pop
+  const livePop = popYears?.[String(year)] ?? popYears?.['2020'] ?? data.pop2024
 
   // Always show all-streams view (disposed + recycled + diverted)
   const charSource = data.residential || data.commercial;
@@ -115,7 +117,7 @@ export default function Home({
         </div>
         <div>
           <p className={styles.cityMeta}>
-            {data.pop2024 ? `Population ${data.pop2024.toLocaleString()}` : ""}
+            {livePop ? `Population ${livePop.toLocaleString()}` : ""}
           </p>
           <p className={styles.cityMeta}>
             {liveTons != null ? `${Math.round(liveTons).toLocaleString()} tons` : '—'}
