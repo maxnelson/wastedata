@@ -8,15 +8,17 @@
 .content {
   flex: 1;
   display: flex;
+  flex-direction: column;
   min-width: 0;
   min-height: 0;
   margin-left: var(--sidebar-width);
-  /* NO overflow: hidden — pass scroll through to .panels */
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 @media (max-width: 768px) {
   .content {
     margin-left: 0;
-    margin-top: var(--mobile-sidebar-height);
+    padding-top: var(--mobile-sidebar-height);
   }
 }

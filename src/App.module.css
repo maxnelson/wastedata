@@ -8,10 +8,8 @@
 .body {
   flex: 1;
   padding-top: var(--header-height);
-  padding-bottom: var(--footer-height);
   display: flex;
-  min-height: 0; /* allow flex children to shrink below content height */
-  /* NO overflow: hidden here — we need the scroll chain to reach .panels */
+  min-height: 0;
 }
 
 /* ─── Comparison panel container ─────────────────────────
@@ -22,11 +20,7 @@
    ─────────────────────────────────────────────────────── */
 .panels {
   display: flex;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;    /* ← one scroll bar for the whole comparison */
-  overflow-x: hidden;
-  align-items: flex-start; /* panels grow to natural height, not viewport height */
+  align-items: flex-start;
 }
 
 .panelA {
