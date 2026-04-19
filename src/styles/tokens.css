@@ -6,54 +6,57 @@
   /* ── Waste category palette ────────────────────────────────
      These are DATA colors. They map directly to D3 color scales
      and must stay consistent across all themes.              */
-  --cat-organic:      #52b788;
-  --cat-paper:        #4895ef;
-  --cat-plastic:      #f77f00;
+  --cat-organic: #52b788;
+  --cat-paper: #4895ef;
+  --cat-plastic: #f77f00;
   --cat-construction: #a07850;
-  --cat-metal:        #8b9fa8;
-  --cat-residue:      #6b7280;
-  --cat-special:      #f4c430;
-  --cat-glass:        #06b6d4;
-  --cat-electronics:  #9b5de5;
-  --cat-hhw:          #fb7185;
+  --cat-metal: #8b9fa8;
+  --cat-residue: #6b7280;
+  --cat-special: #f4c430;
+  --cat-glass: #06b6d4;
+  --cat-electronics: #9b5de5;
+  --cat-hhw: #fb7185;
 
   /* ── Spacing ───────────────────────────────────────────── */
-  --space-1:  4px;
-  --space-2:  8px;
-  --space-3:  12px;
-  --space-4:  16px;
-  --space-5:  20px;
-  --space-6:  24px;
-  --space-8:  32px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
   --space-10: 40px;
   --space-12: 48px;
 
   /* ── Radius ────────────────────────────────────────────── */
-  --radius-sm:   4px;
-  --radius-md:   8px;
-  --radius-lg:   12px;
-  --radius-xl:   16px;
-  --radius-2xl:  24px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
   --radius-full: 9999px;
 
   /* ── Shadows ───────────────────────────────────────────── */
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
 
   /* ── Typography ────────────────────────────────────────── */
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: ui-monospace, 'JetBrains Mono', 'Fira Code', monospace;
+  --font-sans:
+    "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono", "Fira Code", monospace;
 
-  --text-xs:   11px;
-  --text-sm:   13px;
+  --text-xs: 11px;
+  --text-sm: 13px;
   --text-base: 14px;
-  --text-md:   16px;
-  --text-lg:   18px;
-  --text-xl:   22px;
-  --text-2xl:  28px;
-  --text-3xl:  38px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 38px;
 
   /* ── Layout ────────────────────────────────────────────── */
   --header-height: 62px;
@@ -67,14 +70,13 @@
   --transition-slow: 300ms ease;
 
   /* ── Performance scoring ───────────────────────────────── */
-  --perf-better:        #0d9488;   /* teal — city with lower per-capita waste */
-  --perf-better-bg:     #f0fdfa;
+  --perf-better: #0d9488; /* teal — city with lower per-capita waste */
+  --perf-better-bg: #f0fdfa;
   --perf-better-border: #99f6e4;
-  --perf-worse:         #dc2626;   /* red — city with higher per-capita waste */
-  --perf-worse-bg:      #fef2f2;
-  --perf-worse-border:  #fecaca;
+  --perf-worse: #dc2626; /* red — city with higher per-capita waste */
+  --perf-worse-bg: #fef2f2;
+  --perf-worse-border: #fecaca;
 }
-
 
 /* ─────────────────────────────────────────────────────────────
    ANALYTICAL THEME — dashboard-style, technical, data-dense.
@@ -89,7 +91,7 @@
   --brand-400: #74c69d;
   --brand-300: #95d5b2;
   --brand-100: #d8f3dc;
-  --brand-50:  #f0faf4;
+  --brand-50: #f0faf4;
 
   /* Neutrals */
   --gray-950: #080c0a;
@@ -102,45 +104,43 @@
   --gray-300: #d1d5db;
   --gray-200: #e5e7eb;
   --gray-100: #f3f4f6;
-  --gray-50:  #f9fafb;
+  --gray-50: #f9fafb;
 
   /* Surfaces */
-  --surface-base:    #f4f6f8;
-  --surface-card:    #ffffff;
+  --surface-base: #f4f6f8;
+  --surface-card: #ffffff;
   --surface-sidebar: #ffffff;
-  --surface-header:  var(--brand-800);
+  --surface-header: var(--brand-800);
 
   /* Text */
-  --text-primary:       #111827;
-  --text-secondary:     #4b5563;
-  --text-muted:         #9ca3af;
-  --text-on-dark:       #ffffff;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  --text-on-dark: #ffffff;
   --text-on-dark-muted: rgba(255, 255, 255, 0.55);
 
   /* Borders */
   --border-subtle: #e5e7eb;
   --border-strong: #d1d5db;
-  --border-focus:  #52b788;
+  --border-focus: #52b788;
 
   /* Status */
   --status-positive: #22c55e;
   --status-negative: #ef4444;
 
   /* Header-adaptive colors (dark header) */
-  --header-fg:        var(--text-on-dark);
-  --header-fg-muted:  var(--text-on-dark-muted);
-  --header-hover-bg:  rgba(255, 255, 255, 0.08);
+  --header-fg: var(--text-on-dark);
+  --header-fg-muted: var(--text-on-dark-muted);
+  --header-hover-bg: rgba(255, 255, 255, 0.08);
   --header-active-bg: rgba(255, 255, 255, 0.1);
-  --header-border:    rgba(255, 255, 255, 0.15);
-  --header-accent:    var(--brand-400);
+  --header-border: rgba(255, 255, 255, 0.15);
+  --header-accent: white;
 
   /* City comparison accents — subtle tints on dark header */
   --city-a-accent: var(--brand-400);
-  --city-a-bg:     rgba(116, 198, 157, 0.18);
+  --city-a-bg: rgba(116, 198, 157, 0.18);
   --city-a-border: rgba(116, 198, 157, 0.38);
   --city-b-accent: #93c5fd;
-  --city-b-bg:     rgba(147, 197, 253, 0.15);
+  --city-b-bg: rgba(147, 197, 253, 0.15);
   --city-b-border: rgba(147, 197, 253, 0.35);
 }
-
-
