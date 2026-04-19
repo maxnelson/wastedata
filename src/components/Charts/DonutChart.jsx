@@ -57,7 +57,6 @@ export default function DonutChart({ categories }) {
   function selectSegment(i, isSelected) {
     if (isSelected) return          // clicking the active segment does nothing
     setSelectedIdx(i)
-    setInfoOpen(false)              // collapse info whenever segment changes
   }
 
   // Pre-compute angular spans, accumulating from 0°
