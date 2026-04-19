@@ -62,9 +62,9 @@ function CompareView() {
               />
             </div>
           </div>
-          <Footer />
         </Layout>
         </FilterProvider>
+      <Footer />
       </div>
     </div>
   )
