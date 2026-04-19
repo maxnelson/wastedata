@@ -11,7 +11,17 @@
   gap: var(--space-4);
 }
 
-/* ─── State selector ─────────────────────────────────────── */
+/* ─── Hover label — full width, reserved height for 2 lines ─ */
+.hoverInfo {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  width: 100%;
+  min-height: calc(var(--text-sm) * 1.4 * 2);
+  line-height: 1.4;
+  margin-top: calc(var(--space-3) * -0.5);
+}
+
+
 .stateSelect {
   padding: 4px 8px;
   border: 1px solid var(--gray-200);

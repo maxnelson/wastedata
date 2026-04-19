@@ -32,6 +32,13 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
   const effectiveState = cityObj?.state ?? selectedState
   const selectedName   = cityObj?.city ?? null
 
+  const displayCity = hoveredCity ?? (selectedName ? MOCK_DATA[selectedName] && { name: selectedName, ...MOCK_DATA[selectedName] } : null)
+  const hoverLabel  = displayCity
+    ? mode === 'perCapita'
+      ? `${displayCity.name} — ${displayCity.perCapita} lbs/person/day`
+      : `${displayCity.name} — ${Math.round(displayCity.q1Total2024).toLocaleString()} tons`
+    : null
+
   const sourceList = mode === 'perCapita' ? CITIES_BY_CAPITA : CITIES_BY_VOLUME
   const maxVal     = mode === 'perCapita' ? MAX_CAPITA : MAX_VOLUME
 
@@ -68,6 +75,8 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
           </button>
         </div>
       </div>
+
+      <div className={styles.hoverInfo}>{hoverLabel ?? ''}</div>
 
       <div className={styles.scrollContainer}>
         <div className={styles.chartInner}>
