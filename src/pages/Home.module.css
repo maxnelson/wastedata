@@ -334,38 +334,6 @@
   font-weight: 600;
 }
 
-/* ─── Page actions (bottom of page) ────────────────────── */
-.pageActions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--border-subtle);
-}
-
-.actionBtn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  background: var(--surface-card);
-  font-size: var(--text-sm);
-  font-family: var(--font-sans);
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  box-shadow: var(--shadow-xs);
-  transition: all var(--transition-fast);
-}
-
-.actionBtn:hover {
-  border-color: var(--gray-300);
-  background: var(--gray-50);
-  box-shadow: var(--shadow-sm);
-  color: var(--text-primary);
-}
 
 /* ─── Responsive reflow via container queries ───────────── */
 /* Kicks in when the panel is at half-width (comparison mode) */

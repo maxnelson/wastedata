@@ -48,7 +48,7 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
   )
 
   return (
-    <div className={styles.section} style={{ '--chart-accent': accentColor }}>
+    <div className={styles.section}>
       <div className={styles.header}>
         <select
           className={styles.stateSelect}

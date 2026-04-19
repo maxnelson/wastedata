@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Share2, Download } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/pro-regular-svg-icons";
 import styles from "./Home.module.css";
@@ -142,17 +141,6 @@ export default function Home({
       {/* ── State-wide per-capita ranking ───────────────── */}
       <StateBarChart cityObj={cityObj} accentColor={accentColor} />
 
-      {/* ── Page actions — intentionally at the bottom ──── */}
-      <div className={styles.pageActions}>
-        <button className={styles.actionBtn}>
-          <Share2 size={13} />
-          Share
-        </button>
-        <button className={styles.actionBtn}>
-          <Download size={13} />
-          Export CSV
-        </button>
-      </div>
     </div>
   );
 }

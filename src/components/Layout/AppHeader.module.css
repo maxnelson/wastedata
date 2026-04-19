@@ -19,8 +19,12 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 7px;
   flex-shrink: 0;
+  text-decoration: none;
+}
+
+.logo:hover {
   text-decoration: none;
 }
 
@@ -31,9 +35,9 @@
 }
 
 .logoName {
-  font-size: var(--text-md);
+  font-size: var(--text-lg);
   font-weight: 700;
-  color: var(--header-fg);
+  color: var(--header-accent);
   letter-spacing: -0.4px;
 }
 

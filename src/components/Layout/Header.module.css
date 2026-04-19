@@ -11,7 +11,9 @@
   gap: var(--space-6);
   z-index: 100;
   /* Subtle bottom border that reads as a separator on the sidebar */
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.07), 0 2px 8px rgba(0, 0, 0, 0.18);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.07),
+    0 2px 8px rgba(0, 0, 0, 0.18);
 }
 
 /* ─── Logo ─────────────────────────────────────────────── */
@@ -63,7 +65,9 @@
   text-decoration: none;
   padding: 6px var(--space-3);
   border-radius: var(--radius-md);
-  transition: color var(--transition-fast), background var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .navLink:hover {
