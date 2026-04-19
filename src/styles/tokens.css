@@ -107,9 +107,9 @@
   --gray-50: #f9fafb;
 
   /* Surfaces */
-  --surface-base: #f4f6f8;
+  --surface-base: #ffffff;
   --surface-card: #ffffff;
-  --surface-sidebar: #ffffff;
+  --surface-sidebar: #f4f6f8;
   --surface-header: var(--brand-800);
 
   /* Text */
