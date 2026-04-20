@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Info, ChevronDown } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/pro-regular-svg-icons";
@@ -71,6 +71,17 @@ export default function Home({
 
   const [legendOpen, setLegendOpen]     = useState(false)
   const [sourceExpanded, setSourceExpanded] = useState(false)
+  const [charData, setCharData]         = useState(null)
+
+  useEffect(() => {
+    if (!data?.hasCharacterization) { setCharData(null); return }
+    const base = import.meta.env.VITE_CHAR_BASE_URL
+    if (!base) { setCharData(null); return }
+    fetch(`${base}/${data.slug}.json`)
+      .then(r => r.ok ? r.json() : null)
+      .then(setCharData)
+      .catch(() => setCharData(null))
+  }, [data?.slug, data?.hasCharacterization])
 
   function toggleLegend() {
     setLegendOpen(v => {
@@ -87,7 +98,7 @@ export default function Home({
   const livePop = popYears?.[String(year)] ?? popYears?.['2020'] ?? data.pop2024
 
   // Always show all-streams view (disposed + recycled + diverted)
-  const charSource = data.residential || data.commercial;
+  const charSource = charData?.residential || charData?.commercial;
   const CATEGORIES = charSource
     ? CATEGORY_ORDER.map((name) => ({
         name,

@@ -14,8 +14,12 @@ dist-ssr/
 npm-debug.log*
 logs/
 
-# Raw source data (binary xlsx files — re-downloadable via tools/data_extraction/)
+# Data directories — live in wastedata-ca-data repo; downloaded via npm run sync:data
 data/raw/
+data/processed/
+
+# Data pipeline scripts — live in wastedata-ca-data repo
+tools/
 
 # Python bytecode
 __pycache__/

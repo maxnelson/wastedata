@@ -10,17 +10,34 @@ A React web app that visualizes CalRecycle waste disposal data for all ~419 Cali
 
 ```bash
 npm run dev          # Vite dev server (http://localhost:5173)
-npm run build        # Production build → dist/
+npm run build        # Production build → dist/  (requires data/processed/ to exist)
+npm run build:prod   # Download latest data, then build (for CI / fresh clone)
+npm run sync:data    # Download latest core JSON files from wastedata-ca-data GitHub release
 npm run preview      # Serve the production build locally
 npm run lint         # ESLint
-
-# Data tools
-npm run fetch:waste-characterization -- "Alameda"   # Download CalRecycle waste characterization xlsx
-npm run fetch:waste-characterization -- --discover  # List all available counties
-npm run gen:city-colors                             # Regenerate src/styles/cityPalette.js and src/data/cityColorMap.js
 ```
 
-**Module type note:** `package.json` uses `"type": "module"`. The CalRecycle fetch script is `.cjs` to stay CommonJS.
+**Data pipeline commands** live in the separate `wastedata-ca-data` repo (see Data Repository section below).
+
+## Data Repository
+
+The data pipeline and all processed JSON files live in a separate GitHub repo: `github.com/maxnelson/wastedata-ca-data`.
+
+**How this app gets data:**
+- Three core JSON files (`jurisdictions.json`, `by_jurisdiction.json`, `population.json`) are downloaded from the data repo's GitHub Release (`data-latest` tag) via `npm run sync:data` and bundled by Vite at build time.
+- Per-city characterization data is fetched at runtime from GitHub Pages on the data repo (`VITE_CHAR_BASE_URL` in `.env.local`).
+
+**Workflow when data changes:**
+1. Run the pipeline in `wastedata-ca-data`: `npm run transform:all`
+2. Commit and push the updated processed JSON — GitHub Actions auto-publishes the release artifact and updates GitHub Pages.
+3. In this repo: `npm run sync:data` to pull the updated core JSONs, then rebuild.
+
+**Local dev setup after fresh clone:**
+```bash
+npm install
+npm run sync:data   # downloads data/processed/ from GitHub release
+npm run dev
+```
 
 ## Architecture
 
@@ -54,7 +71,7 @@ CSS Modules for all components. Design tokens (colors, spacing, typography, shad
 `src/styles/cityPalette.js` — 400 color tokens (20 hues × 20 shades, named `cyan_01`…`sand_20`).
 `src/data/cityColorMap.js` — static mapping of `"CityName|CA"` → palette token + `getCityColor()` helper.
 
-**Both files are auto-generated** by `npm run gen:city-colors` (runs `tools/data_transformation/build_city_color_map.py`). Regenerate and commit whenever `jurisdictions.json` gains new entries. Do not edit them by hand.
+**Both files are auto-generated** by `npm run gen:city-colors` in the `wastedata-ca-data` repo. Copy the two output JS files back here and commit them whenever `jurisdictions.json` gains new entries. Do not edit them by hand.
 
 ### Charts
 Charts are built with SVG and CSS — no D3 runtime dependency despite the tech-stack intention. `DonutChart.jsx` uses SVG arcs computed manually. `StateBarChart.jsx` uses CSS flex + inline `height` percentages.
