@@ -69,6 +69,8 @@ export default function Home({
   const { year, quarter } = useFilter()
   const qNum = parseInt(quarter.replace('Q', ''), 10)
 
+  const data = MOCK_DATA[city] || MOCK_DATA["Berkeley"];
+
   const [legendOpen, setLegendOpen]     = useState(false)
   const [sourceExpanded, setSourceExpanded] = useState(false)
   const [charData, setCharData]         = useState(null)
@@ -89,8 +91,6 @@ export default function Home({
       return !v
     })
   }
-
-  const data = MOCK_DATA[city] || MOCK_DATA["Berkeley"];
   const disposalRecord = getDisposalRecord(city, year, qNum)
   const livePerCapita = computePerCapita(city, year, disposalRecord)
   const liveTons = disposalRecord?.total ?? null
@@ -98,7 +98,7 @@ export default function Home({
   const livePop = popYears?.[String(year)] ?? popYears?.['2020'] ?? data.pop2024
 
   // Always show all-streams view (disposed + recycled + diverted)
-  const charSource = charData?.residential || charData?.commercial;
+  const charSource = charData?.residential?.categories || charData?.commercial?.categories;
   const CATEGORIES = charSource
     ? CATEGORY_ORDER.map((name) => ({
         name,

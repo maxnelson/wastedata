@@ -12,7 +12,8 @@
   transition: transform 0.18s ease;
 }
 
-.segmentSelected {}
+.segmentSelected {
+}
 
 .centerPct {
   font-family: var(--font-sans);
@@ -63,7 +64,9 @@
   color: var(--gray-400);
   cursor: pointer;
   border-radius: var(--radius-sm);
-  transition: color var(--transition-fast), background var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
   flex-shrink: 0;
 }
 
@@ -80,7 +83,7 @@
   font-size: var(--text-sm);
   color: var(--text-secondary);
   line-height: 1.6;
-  margin-top: var(--space-3);
+  margin-top: 0px;
 }
 
 .explanationPrompt {
