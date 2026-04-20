@@ -19,8 +19,8 @@ tar -xzf "$TMP_DIR/core-data.tar.gz" -C "$TMP_DIR"
 
 # Copy the extracted files into data/processed/
 cp "$TMP_DIR/data/processed/jurisdictions.json" "$DEST/"
-cp "$TMP_DIR/data/processed/by_jurisdiction.json" "$DEST/"
 cp "$TMP_DIR/data/processed/population.json" "$DEST/"
+cp "$TMP_DIR/data/processed/disposal/by_jurisdiction.json" "$DEST/disposal/"
 cp "$TMP_DIR/data/processed/disposal/jurisdiction_county_map.json" "$DEST/disposal/"
 
 rm -rf "$TMP_DIR"
