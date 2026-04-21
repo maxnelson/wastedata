@@ -1,6 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import styles from './CityPicker.module.css'
-import { CITY_KEYS } from '../data/cities'
+import { useAppData } from '../contexts/DataContext'
 
 // Maps Nominatim city names → CalRecycle jurisdiction names where they differ.
 // Add an entry here when searching a city shows it greyed-out despite having data.
@@ -31,6 +31,7 @@ function CheckIcon() {
  *   onCloseEmpty — called when user dismisses without selecting (e.g. Escape with no value set)
  */
 export default function CityPicker({ value, onChange, excludeCity, openOnMount, onCloseEmpty }) {
+  const { CITY_KEYS } = useAppData()
   const [open, setOpen]           = useState(false)
   const [query, setQuery]         = useState('')
   const [results, setResults]     = useState([])

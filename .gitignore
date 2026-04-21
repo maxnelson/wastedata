@@ -14,16 +14,8 @@ dist-ssr/
 npm-debug.log*
 logs/
 
-# Data directories — live in wastedata-ca-data repo; downloaded via npm run sync:data
-data/raw/
-data/processed/
-
-# Data pipeline scripts — live in wastedata-ca-data repo
+# Data pipeline tools — canonical version lives in wastedata-ca-data repo
 tools/
-
-# Python bytecode
-__pycache__/
-*.pyc
 
 # Claude Code local settings (machine-specific)
 .claude/

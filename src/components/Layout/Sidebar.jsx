@@ -1,6 +1,6 @@
 import styles from './Sidebar.module.css'
 import { useFilter } from '../../contexts/FilterContext'
-import { quartersWithData } from '../../data/cities'
+import { useAppData } from '../../contexts/DataContext'
 
 const YEARS = [2025, 2024, 2023, 2022, 2021, 2020, 2019]
 const QUARTERS = ['Q1', 'Q2', 'Q3', 'Q4']
@@ -10,6 +10,7 @@ function SectionLabel({ children, style }) {
 }
 
 export default function Sidebar() {
+  const { quartersWithData } = useAppData()
   const { year, quarter, setYear, setQuarter } = useFilter()
 
   const availableQNums = quartersWithData[year] ?? new Set()

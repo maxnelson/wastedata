@@ -4,33 +4,35 @@ import AppHeader from './components/Layout/AppHeader'
 import Footer from './components/Layout/Footer'
 import Layout from './components/Layout/Layout'
 import Home from './pages/Home'
-import { MOCK_DATA } from './data/cities'
 import { segmentToCityObj, cityObjToSegment, randomCityPair } from './utils/cityUrl'
 import { FilterProvider } from './contexts/FilterContext'
+import { useAppData } from './contexts/DataContext'
 import styles from './App.module.css'
 
 /** Picks two random cities and redirects immediately. */
 function RandomRedirect() {
-  const [a, b] = randomCityPair()
-  return <Navigate to={`/compare/${cityObjToSegment(a)}/${cityObjToSegment(b)}`} replace />
+  const { jurisdictions } = useAppData()
+  const [a, b] = randomCityPair(jurisdictions)
+  return <Navigate to={`/compare/${cityObjToSegment(jurisdictions, a)}/${cityObjToSegment(jurisdictions, b)}`} replace />
 }
 
 /** Main comparison view — city state lives entirely in the URL. */
 function CompareView() {
   const { slugA, slugB } = useParams()
   const navigate = useNavigate()
+  const { jurisdictions, MOCK_DATA } = useAppData()
 
-  const cityA = segmentToCityObj(slugA)
-  const cityB = segmentToCityObj(slugB)
+  const cityA = segmentToCityObj(jurisdictions, slugA)
+  const cityB = segmentToCityObj(jurisdictions, slugB)
 
   // Unknown slugs → start over with random cities
   if (!cityA || !cityB) return <Navigate to="/" replace />
 
   function handleCityAChange(newCity) {
-    navigate(`/compare/${cityObjToSegment(newCity)}/${slugB}`, { replace: true })
+    navigate(`/compare/${cityObjToSegment(jurisdictions, newCity)}/${slugB}`, { replace: true })
   }
   function handleCityBChange(newCity) {
-    navigate(`/compare/${slugA}/${cityObjToSegment(newCity)}`, { replace: true })
+    navigate(`/compare/${slugA}/${cityObjToSegment(jurisdictions, newCity)}`, { replace: true })
   }
 
   const perCapitaA = MOCK_DATA[cityA.city]?.perCapita ?? null
@@ -71,6 +73,9 @@ function CompareView() {
 }
 
 export default function App() {
+  const appData = useAppData()
+  if (!appData) return null
+
   return (
     <Routes>
       <Route path="/"                       element={<RandomRedirect />} />

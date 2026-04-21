@@ -1,5 +1,5 @@
 import styles from './SocialLayout.module.css'
-import { MOCK_DATA } from '../../data/cities'
+import { useAppData } from '../../contexts/DataContext'
 
 // Matches the shared --cat-* tokens so donut segments stay consistent
 const CATEGORIES = [
@@ -23,6 +23,7 @@ function buildConic(cats) {
 }
 
 function CityPanel({ city, side }) {
+  const { MOCK_DATA } = useAppData()
   const data = MOCK_DATA[city] || MOCK_DATA['Berkeley']
   const isGood = data.yoy < 0
 

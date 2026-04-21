@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
-import { disposalByJurisdiction, populationData } from '../../data/cities'
+import { useAppData } from '../../contexts/DataContext'
 import { useFilter } from '../../contexts/FilterContext'
 import { getCityColor } from '../../data/cityColorMap'
 import styles from './StateBarChart.module.css'
@@ -33,6 +33,7 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
   const dragRef = useRef({ active: false })
   const svgRef  = useRef(null)
 
+  const { disposalByJurisdiction, populationData } = useAppData()
   const { year, quarter } = useFilter()
   const qNum = parseInt(quarter.replace('Q', ''), 10)
 
@@ -56,7 +57,7 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
     }
     entries.sort((a, b) => b.value - a.value)
     return entries
-  }, [year, qNum, mode, effectiveState])
+  }, [year, qNum, mode, effectiveState, disposalByJurisdiction, populationData])
 
   // 98th percentile of the full dataset — stable anchor for Capped mode
   const capVal = useMemo(() => {

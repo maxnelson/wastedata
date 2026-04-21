@@ -7,9 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint .",
-    "sync:data": "bash scripts/sync-data.sh",
-    "build:prod": "npm run sync:data && npm run build"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.2.0",

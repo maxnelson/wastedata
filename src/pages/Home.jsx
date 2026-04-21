@@ -3,7 +3,8 @@ import { Info, ChevronDown } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/pro-regular-svg-icons";
 import styles from "./Home.module.css";
-import { MOCK_DATA, getDisposalRecord, computePerCapita, populationData } from "../data/cities";
+import { getDisposalRecord, computePerCapita } from "../data/cities";
+import { useAppData } from "../contexts/DataContext";
 import { useFilter } from "../contexts/FilterContext";
 import CityPicker from "../components/CityPicker";
 import DonutChart from "../components/Charts/DonutChart";
@@ -66,6 +67,7 @@ export default function Home({
   excludeCity,
   vsPerCapita = null,
 }) {
+  const { MOCK_DATA, populationData, disposalByJurisdiction } = useAppData()
   const { year, quarter } = useFilter()
   const qNum = parseInt(quarter.replace('Q', ''), 10)
 
@@ -77,7 +79,7 @@ export default function Home({
 
   useEffect(() => {
     if (!data?.hasCharacterization) { setCharData(null); return }
-    const base = import.meta.env.VITE_CHAR_BASE_URL
+    const base = import.meta.env.VITE_DATA_BASE_URL
     if (!base) { setCharData(null); return }
     fetch(`${base}/${data.slug}.json`)
       .then(r => r.ok ? r.json() : null)
@@ -91,8 +93,8 @@ export default function Home({
       return !v
     })
   }
-  const disposalRecord = getDisposalRecord(city, year, qNum)
-  const livePerCapita = computePerCapita(city, year, disposalRecord)
+  const disposalRecord = getDisposalRecord(disposalByJurisdiction, city, year, qNum)
+  const livePerCapita = computePerCapita(populationData, city, year, disposalRecord)
   const liveTons = disposalRecord?.total ?? null
   const popYears = populationData[city]?.pop
   const livePop = popYears?.[String(year)] ?? popYears?.['2020'] ?? data.pop2024
