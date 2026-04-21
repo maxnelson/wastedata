@@ -50,3 +50,15 @@
     width 380ms cubic-bezier(0.4, 0, 0.2, 1),
     opacity 220ms ease 120ms;
 }
+
+/* Full-width sections that span both columns (e.g. shared headers, unified charts).
+   Horizontal padding matches .page in Home.module.css so content edges align. */
+.fullWidthSection {
+  padding: 0 var(--space-8);
+}
+
+/* Inner wrapper for donut charts in the two-column donut row.
+   Replicates the padding and gap context of .page so charts feel at home. */
+.donutPanel {
+  padding: 0 var(--space-8) var(--space-8);
+}
