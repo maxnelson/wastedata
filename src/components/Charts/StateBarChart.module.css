@@ -11,14 +11,19 @@
   gap: var(--space-4);
 }
 
-/* ─── Hover label — full width, reserved height for 2 lines ─ */
-.hoverInfo {
+/* ─── Two fixed info rows above the chart ───────────────── */
+.infoSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: calc(var(--space-3) * -0.5);
+}
+
+.infoRow {
   font-size: var(--text-sm);
   color: var(--text-secondary);
-  width: 100%;
-  min-height: calc(var(--text-sm) * 1.4 * 2);
   line-height: 1.4;
-  margin-top: calc(var(--space-3) * -0.5);
+  min-height: calc(var(--text-sm) * 1.4);
 }
 
 .stateSelect {
@@ -71,7 +76,7 @@
 
 /* ─── Scrollable chart area ──────────────────────────────── */
 .scrollContainer {
-  overflow-x: auto;
+  overflow-x: scroll;
   /* Extra bottom padding so the scrollbar sits below the bars, not over them */
   padding-bottom: 8px;
   scrollbar-width: thin;
@@ -142,8 +147,12 @@
   line-height: 1.4;
 }
 
-.scaleBadge { left: 4px; }
-.brushBadge { right: 4px; }
+.scaleBadge {
+  left: 4px;
+}
+.brushBadge {
+  right: 4px;
+}
 
 /* ─── Mini overview chart ────────────────────────────────── */
 .miniChartWrapper {
@@ -203,16 +212,20 @@
   display: flex;
   align-items: flex-end;
   flex-shrink: 0;
-  cursor: default;
+  cursor: pointer;
 }
 
 .bar {
   position: relative;
   width: 100%;
   border-radius: 1px 1px 0 0;
-  background: var(--gray-300); /* fallback; inline style overrides with city color */
-  opacity: 0.45;
-  transition: height 0.35s ease, opacity 0.15s ease;
+  background: var(
+    --gray-300
+  ); /* fallback; inline style overrides with city color */
+  opacity: 0.7;
+  transition:
+    height 0.35s ease,
+    opacity 0.15s ease;
 }
 
 .overflowIndicator {
@@ -226,12 +239,12 @@
   opacity: 0.8;
 }
 
-.barSelected {
+.barHovered {
   opacity: 1;
 }
 
-.barHovered {
-  opacity: 0.85;
+.barPinned {
+  opacity: 1;
 }
 
 .axisLine {

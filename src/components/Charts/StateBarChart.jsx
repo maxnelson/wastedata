@@ -27,8 +27,9 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
   const [mode, setMode]                   = useState('perCapita')
   const [hoveredCity, setHoveredCity]     = useState(null)
   const [scaleMode, setScaleMode]         = useState('normal')
-  const [brushRange, setBrushRange]       = useState(null)  // { start, end } city indices
+  const [brushRange, setBrushRange]       = useState(null)
   const [dragPreview, setDragPreview]     = useState(null)
+  const [pinnedCities, setPinnedCities]   = useState([])
 
   const dragRef = useRef({ active: false })
   const svgRef  = useRef(null)
@@ -59,17 +60,14 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
     return entries
   }, [year, qNum, mode, effectiveState, disposalByJurisdiction, populationData])
 
-  // 98th percentile of the full dataset — stable anchor for Capped mode
   const capVal = useMemo(() => {
     if (cities.length === 0) return 1
     const sorted = [...cities].sort((a, b) => a.value - b.value)
     return sorted[Math.floor(0.98 * (sorted.length - 1))].value
   }, [cities])
 
-  // Validate brushRange against current cities length to handle stale ranges
   const validBrush = brushRange && brushRange.end < cities.length ? brushRange : null
 
-  // Brush-filtered subset; scale modes apply on top of this
   const visibleCities = useMemo(() => {
     if (!validBrush) return cities
     return cities.slice(validBrush.start, validBrush.end + 1)
@@ -77,16 +75,13 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
 
   const effectiveMax = visibleCities[0]?.value ?? 1
 
-  const displayCity = hoveredCity ?? (selectedName ? visibleCities.find(c => c.name === selectedName) ?? null : null)
-  const hoverLabel  = displayCity
-    ? mode === 'perCapita'
-      ? `${displayCity.name} — ${displayCity.value} lbs/person/day`
-      : `${displayCity.name} — ${Math.round(displayCity.value).toLocaleString()} tons`
-    : null
+  function valueStr(city) {
+    return mode === 'perCapita'
+      ? `${city.value} lbs/person/day`
+      : `${Math.round(city.value).toLocaleString()} tons`
+  }
 
   // ── Brush interaction ────────────────────────────────────────
-  // Handlers are created fresh per drag so they close over the correct
-  // cities.length and svg ref at the moment dragging starts.
   function handleBrushMouseDown(e) {
     e.preventDefault()
     const svg       = svgRef.current
@@ -112,7 +107,6 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
       setDragPreview(null)
       setBrushRange(end - start < 2 ? null : { start, end })
     }
-    // Store cleanup fn so unmount can remove listeners if drag is in progress
     dragRef.current.cleanup = () => {
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseup',   onUp)
@@ -176,7 +170,14 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
         </div>
       </div>
 
-      <div className={styles.hoverInfo}>{hoverLabel ?? ''}</div>
+      {/* Two fixed info rows: row1=pinned[0], row2=hovered??pinned[1] */}
+      <div className={styles.infoSection}>
+        {[hoveredCity ?? pinnedCities[1], pinnedCities[0]].map((city, i) => (
+          <div key={i} className={styles.infoRow}>
+            {city && <span><strong>{city.name}</strong>{' — '}{valueStr(city)}</span>}
+          </div>
+        ))}
+      </div>
 
       {/* Main bar chart */}
       <div className={styles.chartArea}>
@@ -197,6 +198,7 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
                 <div className={styles.noData}>No data for {quarter} {year}</div>
               ) : visibleCities.map(city => {
                 const isSelected = city.name === selectedName
+                const isPinned   = pinnedCities.some(c => c.name === city.name)
                 const isHovered  = hoveredCity?.name === city.name
                 const heightPct  = getHeightPct(city.value, scaleMode, effectiveMax, capVal)
                 const isCapped   = scaleMode === 'capped' && city.value > capVal
@@ -212,9 +214,17 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
                     }
                     onMouseEnter={() => setHoveredCity(city)}
                     onMouseLeave={() => setHoveredCity(null)}
+                    onClick={() => {
+                      setPinnedCities(prev => {
+                        const alreadyIdx = prev.findIndex(c => c.name === city.name)
+                        if (alreadyIdx !== -1) return prev.filter((_, i) => i !== alreadyIdx)
+                        if (prev.length < 2) return [...prev, city]
+                        return [prev[1], city]
+                      })
+                    }}
                   >
                     <div
-                      className={`${styles.bar} ${isSelected ? styles.barSelected : ''} ${isHovered && !isSelected ? styles.barHovered : ''}`}
+                      className={`${styles.bar} ${isSelected ? styles.barSelected : ''} ${isPinned ? styles.barPinned : ''} ${isHovered && !isPinned ? styles.barHovered : ''}`}
                       style={{
                         height: `${heightPct}%`,
                         background: isSelected ? accentColor : getCityColor(`${city.name}|CA`),
