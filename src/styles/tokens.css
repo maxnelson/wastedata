@@ -144,3 +144,338 @@
   --city-b-bg: rgba(147, 197, 253, 0.15);
   --city-b-border: rgba(147, 197, 253, 0.35);
 }
+
+/* ─────────────────────────────────────────────────────────────
+   RAND — Paul Rand. IBM identity. Bold cobalt + signal red.
+   ──────────────────────────────────────────────────────────── */
+[data-theme="rand"] {
+  /* Brand cobalt blues */
+  --brand-900: #0a1929;
+  --brand-800: #1a3f6f;
+  --brand-700: #1d4ed8;
+  --brand-600: #2563eb;
+  --brand-500: #3b82f6;
+  --brand-400: #60a5fa;
+  --brand-300: #93c5fd;
+  --brand-100: #dbeafe;
+  --brand-50:  #eff6ff;
+
+  /* Neutrals — cool grays */
+  --gray-950: #07090f;
+  --gray-900: #111827;
+  --gray-800: #1f2937;
+  --gray-700: #374151;
+  --gray-600: #4b5563;
+  --gray-500: #6b7280;
+  --gray-400: #9ca3af;
+  --gray-300: #d1d5db;
+  --gray-200: #e5e7eb;
+  --gray-100: #f3f4f6;
+  --gray-50:  #f9fafb;
+
+  /* Surfaces */
+  --surface-base:    #ffffff;
+  --surface-card:    #ffffff;
+  --surface-sidebar: #f5f7fa;
+  --surface-header:  var(--brand-800);
+
+  /* Text */
+  --text-primary:       #0f1923;
+  --text-secondary:     #4b5563;
+  --text-muted:         #9ca3af;
+  --text-on-dark:       #ffffff;
+  --text-on-dark-muted: rgba(255, 255, 255, 0.55);
+
+  /* Borders */
+  --border-subtle: #e5e7eb;
+  --border-strong: #d1d5db;
+  --border-focus:  #2563eb;
+
+  /* Status */
+  --status-positive: #22c55e;
+  --status-negative: #ef4444;
+
+  /* Header chrome */
+  --header-fg:        var(--text-on-dark);
+  --header-fg-muted:  var(--text-on-dark-muted);
+  --header-hover-bg:  rgba(255, 255, 255, 0.08);
+  --header-active-bg: rgba(255, 255, 255, 0.1);
+  --header-border:    rgba(255, 255, 255, 0.15);
+  --header-accent:    white;
+
+  /* City comparison accents */
+  --city-a-accent: #60a5fa;
+  --city-a-bg:     rgba(96, 165, 250, 0.15);
+  --city-a-border: rgba(96, 165, 250, 0.35);
+  --city-b-accent: #d42b2b;
+  --city-b-bg:     rgba(212, 43, 43, 0.12);
+  --city-b-border: rgba(212, 43, 43, 0.30);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   BASS — Saul Bass. Film posters, AT&T. Warm charcoal + amber.
+   ──────────────────────────────────────────────────────────── */
+[data-theme="bass"] {
+  /* Brand amber/orange */
+  --brand-900: #451a03;
+  --brand-800: #78350f;
+  --brand-700: #92400e;
+  --brand-600: #b45309;
+  --brand-500: #d97706;
+  --brand-400: #f59e0b;
+  --brand-300: #fcd34d;
+  --brand-100: #fef3c7;
+  --brand-50:  #fffbeb;
+
+  /* Neutrals — warm stone grays */
+  --gray-950: #0c0a09;
+  --gray-900: #1c1917;
+  --gray-800: #292524;
+  --gray-700: #44403c;
+  --gray-600: #57534e;
+  --gray-500: #78716c;
+  --gray-400: #a8a29e;
+  --gray-300: #d6d3d1;
+  --gray-200: #e7e5e4;
+  --gray-100: #f5f5f4;
+  --gray-50:  #fafaf9;
+
+  /* Surfaces */
+  --surface-base:    #faf8f5;
+  --surface-card:    #faf8f5;
+  --surface-sidebar: #f0ece6;
+  --surface-header:  #1c1917;
+
+  /* Text */
+  --text-primary:       #1c1917;
+  --text-secondary:     #57534e;
+  --text-muted:         #a8a29e;
+  --text-on-dark:       #ffffff;
+  --text-on-dark-muted: rgba(255, 255, 255, 0.50);
+
+  /* Borders */
+  --border-subtle: #e7e5e4;
+  --border-strong: #d6d3d1;
+  --border-focus:  #d97706;
+
+  /* Status */
+  --status-positive: #22c55e;
+  --status-negative: #ef4444;
+
+  /* Header chrome */
+  --header-fg:        var(--text-on-dark);
+  --header-fg-muted:  var(--text-on-dark-muted);
+  --header-hover-bg:  rgba(255, 255, 255, 0.07);
+  --header-active-bg: rgba(255, 255, 255, 0.1);
+  --header-border:    rgba(255, 255, 255, 0.12);
+  --header-accent:    #f59e0b;
+
+  /* City comparison accents */
+  --city-a-accent: #f59e0b;
+  --city-a-bg:     rgba(245, 158, 11, 0.15);
+  --city-a-border: rgba(245, 158, 11, 0.35);
+  --city-b-accent: #e879a0;
+  --city-b-bg:     rgba(232, 121, 160, 0.13);
+  --city-b-border: rgba(232, 121, 160, 0.30);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   VIGNELLI — Massimo Vignelli. NYC subway. Black + signal red.
+   ──────────────────────────────────────────────────────────── */
+[data-theme="vignelli"] {
+  /* Brand signal reds */
+  --brand-900: #3d0000;
+  --brand-800: #7a0000;
+  --brand-700: #a30000;
+  --brand-600: #cc0000;
+  --brand-500: #e60000;
+  --brand-400: #ff3333;
+  --brand-300: #ff8080;
+  --brand-100: #ffe0e0;
+  --brand-50:  #fff5f5;
+
+  /* Neutrals — pure neutral grays */
+  --gray-950: #000000;
+  --gray-900: #111111;
+  --gray-800: #222222;
+  --gray-700: #333333;
+  --gray-600: #555555;
+  --gray-500: #777777;
+  --gray-400: #999999;
+  --gray-300: #cccccc;
+  --gray-200: #e0e0e0;
+  --gray-100: #f0f0f0;
+  --gray-50:  #f8f8f8;
+
+  /* Surfaces */
+  --surface-base:    #ffffff;
+  --surface-card:    #ffffff;
+  --surface-sidebar: #f4f4f4;
+  --surface-header:  #000000;
+
+  /* Text */
+  --text-primary:       #000000;
+  --text-secondary:     #333333;
+  --text-muted:         #777777;
+  --text-on-dark:       #ffffff;
+  --text-on-dark-muted: rgba(255, 255, 255, 0.50);
+
+  /* Borders */
+  --border-subtle: #e0e0e0;
+  --border-strong: #cccccc;
+  --border-focus:  #cc0000;
+
+  /* Status */
+  --status-positive: #22c55e;
+  --status-negative: #ef4444;
+
+  /* Header chrome */
+  --header-fg:        var(--text-on-dark);
+  --header-fg-muted:  var(--text-on-dark-muted);
+  --header-hover-bg:  rgba(255, 255, 255, 0.07);
+  --header-active-bg: rgba(255, 255, 255, 0.10);
+  --header-border:    rgba(255, 255, 255, 0.12);
+  --header-accent:    #cc0000;
+
+  /* City comparison accents */
+  --city-a-accent: #cc0000;
+  --city-a-bg:     rgba(204, 0, 0, 0.10);
+  --city-a-border: rgba(204, 0, 0, 0.28);
+  --city-b-accent: #f5c400;
+  --city-b-bg:     rgba(245, 196, 0, 0.13);
+  --city-b-border: rgba(245, 196, 0, 0.35);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   BROCKMANN — Müller-Brockmann. Zurich grid. Steel blue + orange.
+   ──────────────────────────────────────────────────────────── */
+[data-theme="brockmann"] {
+  /* Brand steel blues */
+  --brand-900: #0a1929;
+  --brand-800: #1e3a5f;
+  --brand-700: #1e4a8c;
+  --brand-600: #1d5fa8;
+  --brand-500: #2176cc;
+  --brand-400: #4a9de0;
+  --brand-300: #7ebee8;
+  --brand-100: #dceefb;
+  --brand-50:  #f0f8ff;
+
+  /* Neutrals — cool slate grays */
+  --gray-950: #070c12;
+  --gray-900: #0f172a;
+  --gray-800: #1e293b;
+  --gray-700: #334155;
+  --gray-600: #475569;
+  --gray-500: #64748b;
+  --gray-400: #94a3b8;
+  --gray-300: #cbd5e1;
+  --gray-200: #e2e8f0;
+  --gray-100: #f1f5f9;
+  --gray-50:  #f8fafc;
+
+  /* Surfaces */
+  --surface-base:    #fafbfc;
+  --surface-card:    #fafbfc;
+  --surface-sidebar: #eef1f5;
+  --surface-header:  var(--brand-800);
+
+  /* Text */
+  --text-primary:       #0f172a;
+  --text-secondary:     #475569;
+  --text-muted:         #94a3b8;
+  --text-on-dark:       #ffffff;
+  --text-on-dark-muted: rgba(255, 255, 255, 0.55);
+
+  /* Borders */
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --border-focus:  #2176cc;
+
+  /* Status */
+  --status-positive: #22c55e;
+  --status-negative: #ef4444;
+
+  /* Header chrome */
+  --header-fg:        var(--text-on-dark);
+  --header-fg-muted:  var(--text-on-dark-muted);
+  --header-hover-bg:  rgba(255, 255, 255, 0.08);
+  --header-active-bg: rgba(255, 255, 255, 0.10);
+  --header-border:    rgba(255, 255, 255, 0.15);
+  --header-accent:    white;
+
+  /* City comparison accents */
+  --city-a-accent: #4a9de0;
+  --city-a-bg:     rgba(74, 157, 224, 0.15);
+  --city-a-border: rgba(74, 157, 224, 0.35);
+  --city-b-accent: #ea580c;
+  --city-b-bg:     rgba(234, 88, 12, 0.12);
+  --city-b-border: rgba(234, 88, 12, 0.30);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   AICHER — Otl Aicher. 1972 Munich Olympics. Olympic blue + teal.
+   ──────────────────────────────────────────────────────────── */
+[data-theme="aicher"] {
+  /* Brand Olympic blues */
+  --brand-900: #001833;
+  --brand-800: #00558b;
+  --brand-700: #0066a8;
+  --brand-600: #007dc4;
+  --brand-500: #0090d8;
+  --brand-400: #33aaec;
+  --brand-300: #7fcdf5;
+  --brand-100: #d9f0fc;
+  --brand-50:  #f0f9ff;
+
+  /* Neutrals — warm-neutral grays */
+  --gray-950: #0d1117;
+  --gray-900: #1a2332;
+  --gray-800: #2c3747;
+  --gray-700: #3d4f62;
+  --gray-600: #546475;
+  --gray-500: #7a8a96;
+  --gray-400: #9eadb9;
+  --gray-300: #c8d4dc;
+  --gray-200: #dde6ec;
+  --gray-100: #eef4f7;
+  --gray-50:  #f5f9fb;
+
+  /* Surfaces */
+  --surface-base:    #fafaf8;
+  --surface-card:    #fafaf8;
+  --surface-sidebar: #f0f2ef;
+  --surface-header:  var(--brand-800);
+
+  /* Text */
+  --text-primary:       #1a2332;
+  --text-secondary:     #546475;
+  --text-muted:         #9eadb9;
+  --text-on-dark:       #ffffff;
+  --text-on-dark-muted: rgba(255, 255, 255, 0.55);
+
+  /* Borders */
+  --border-subtle: #dde6ec;
+  --border-strong: #c8d4dc;
+  --border-focus:  #0090d8;
+
+  /* Status */
+  --status-positive: #22c55e;
+  --status-negative: #ef4444;
+
+  /* Header chrome */
+  --header-fg:        var(--text-on-dark);
+  --header-fg-muted:  var(--text-on-dark-muted);
+  --header-hover-bg:  rgba(255, 255, 255, 0.08);
+  --header-active-bg: rgba(255, 255, 255, 0.10);
+  --header-border:    rgba(255, 255, 255, 0.15);
+  --header-accent:    white;
+
+  /* City comparison accents */
+  --city-a-accent: #33aaec;
+  --city-a-bg:     rgba(51, 170, 236, 0.15);
+  --city-a-border: rgba(51, 170, 236, 0.35);
+  --city-b-accent: #00897b;
+  --city-b-bg:     rgba(0, 137, 123, 0.13);
+  --city-b-border: rgba(0, 137, 123, 0.32);
+}
