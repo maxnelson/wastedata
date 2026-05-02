@@ -479,3 +479,161 @@
   --city-b-bg:     rgba(0, 137, 123, 0.13);
   --city-b-border: rgba(0, 137, 123, 0.32);
 }
+
+/* ─────────────────────────────────────────────────────────────
+   CLOUD — Contemporary B2B SaaS. Cloudera/Rubrik energy.
+   Deep teal header, clinical white, cool-tinted grays, violet accent.
+   ──────────────────────────────────────────────────────────── */
+[data-theme="cloud"] {
+  /* Brand deep teal → cyan */
+  --brand-900: #042931;
+  --brand-800: #0c5060;
+  --brand-700: #0e6b7c;
+  --brand-600: #0891a8;
+  --brand-500: #06b6d4;
+  --brand-400: #22d3ee;
+  --brand-300: #67e8f9;
+  --brand-100: #cffafe;
+  --brand-50:  #ecfeff;
+
+  /* Neutrals — cool blue-grays */
+  --gray-950: #06111a;
+  --gray-900: #111c25;
+  --gray-800: #1c2b38;
+  --gray-700: #2e3f50;
+  --gray-600: #47596a;
+  --gray-500: #647888;
+  --gray-400: #93a4b0;
+  --gray-300: #c5d0d8;
+  --gray-200: #dde5eb;
+  --gray-100: #eef3f6;
+  --gray-50:  #f5f8fa;
+
+  /* Surfaces */
+  --surface-base:    #ffffff;
+  --surface-card:    #ffffff;
+  --surface-sidebar: #f0f5f7;
+  --surface-header:  var(--brand-800);
+
+  /* Text */
+  --text-primary:       #111c25;
+  --text-secondary:     #47596a;
+  --text-muted:         #93a4b0;
+  --text-on-dark:       #ffffff;
+  --text-on-dark-muted: rgba(255, 255, 255, 0.55);
+
+  /* Borders — intentionally very subtle, SaaS-standard */
+  --border-subtle: #dde5eb;
+  --border-strong: #c5d0d8;
+  --border-focus:  #06b6d4;
+
+  /* Status */
+  --status-positive: #22c55e;
+  --status-negative: #ef4444;
+
+  /* Header chrome */
+  --header-fg:        var(--text-on-dark);
+  --header-fg-muted:  var(--text-on-dark-muted);
+  --header-hover-bg:  rgba(255, 255, 255, 0.08);
+  --header-active-bg: rgba(255, 255, 255, 0.12);
+  --header-border:    rgba(255, 255, 255, 0.14);
+  --header-accent:    white;
+
+  /* City comparison accents — teal + violet (very SaaS) */
+  --city-a-accent: #22d3ee;
+  --city-a-bg:     rgba(34, 211, 238, 0.13);
+  --city-a-border: rgba(34, 211, 238, 0.32);
+  --city-b-accent: #8b5cf6;
+  --city-b-bg:     rgba(139, 92, 246, 0.12);
+  --city-b-border: rgba(139, 92, 246, 0.30);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TRASHDATA — Original trashdata.net palette.
+   Bright emerald header, clean neutral surfaces, five-color donut.
+   ──────────────────────────────────────────────────────────── */
+[data-theme="trashdata"] {
+  /* Brand scale — built from the screenshot's emerald header green */
+  --brand-900: #174d30;
+  --brand-800: #38ba76;  /* ← exact header green from screenshot */
+  --brand-700: #41c980;
+  --brand-600: #2a9a5e;  /* darker for links/focus on white */
+  --brand-500: #38ba76;
+  --brand-400: #62cc94;
+  --brand-300: #8dddb3;
+  --brand-100: #c6f0da;
+  --brand-50:  #e5f9ef;
+
+  /* Neutrals — clean, untinted. Matches the screenshot's neutral chrome. */
+  --gray-950: #1a1a1a;
+  --gray-900: #2d2d2d;
+  --gray-800: #404040;
+  --gray-700: #555555;
+  --gray-600: #6b6b6b;
+  --gray-500: #888888;
+  --gray-400: #aaaaaa;
+  --gray-300: #cccccc;
+  --gray-200: #e5e5e5;
+  --gray-100: #f2f2f2;
+  --gray-50:  #f9f9f9;
+
+  /* Surfaces — pure white content, very light gray sidebar (matches screenshot) */
+  --surface-base:    #ffffff;
+  --surface-card:    #ffffff;
+  --surface-sidebar: #f5f5f5;
+  --surface-header:  var(--brand-800);
+
+  /* Text — clean neutral, no color cast */
+  --text-primary:       #2d2d2d;
+  --text-secondary:     #6b6b6b;
+  --text-muted:         #aaaaaa;
+  --text-on-dark:       #ffffff;
+  --text-on-dark-muted: rgba(255, 255, 255, 0.65);
+
+  /* Borders — very light, matches screenshot's minimal dividers */
+  --border-subtle: #e5e5e5;
+  --border-strong: #cccccc;
+  --border-focus:  #38ba76;
+
+  /* Status */
+  --status-positive: #38ba76;
+  --status-negative: #e04030;
+
+  /* Header chrome */
+  --header-fg:        var(--text-on-dark);
+  --header-fg-muted:  var(--text-on-dark-muted);
+  --header-hover-bg:  rgba(255, 255, 255, 0.12);
+  --header-active-bg: rgba(255, 255, 255, 0.16);
+  --header-border:    rgba(255, 255, 255, 0.22);
+  --header-accent:    white;
+
+  /* City comparison accents — sky blue (better) + red (worse),
+     matching the screenshot's per-capita figure colors exactly */
+  --city-a-accent: #5bc4e8;
+  --city-a-bg:     rgba(91, 196, 232, 0.15);
+  --city-a-border: rgba(91, 196, 232, 0.35);
+  --city-b-accent: #e04030;
+  --city-b-bg:     rgba(224, 64, 48, 0.12);
+  --city-b-border: rgba(224, 64, 48, 0.30);
+
+  /* Performance indicators — override :root defaults to match screenshot */
+  --perf-better:        #5bc4e8;
+  --perf-better-bg:     rgba(91, 196, 232, 0.10);
+  --perf-better-border: rgba(91, 196, 232, 0.30);
+  --perf-worse:         #e04030;
+  --perf-worse-bg:      rgba(224, 64, 48, 0.08);
+  --perf-worse-border:  rgba(224, 64, 48, 0.28);
+
+  /* Data category colors — overrides :root, matched to screenshot donut segments.
+     The 5 screenshot colors map to our 10 categories by semantic proximity. */
+  --cat-organic:      #38ba76;  /* Green  — Trash / organic material */
+  --cat-paper:        #5bc4e8;  /* Sky blue — Compost / paper */
+  --cat-plastic:      #f0a023;  /* Amber   — Industrial / plastic */
+  --cat-construction: #c8a060;  /* Tan     — Construction (amber derivative) */
+  --cat-metal:        #93b5c0;  /* Cool gray-blue — Metal */
+  --cat-residue:      #7a8890;  /* Muted gray — Mixed residue */
+  --cat-special:      #e8c840;  /* Yellow  — Special waste (amber-adjacent) */
+  --cat-glass:        #40d0f0;  /* Light cyan — Glass (sky blue derivative) */
+  --cat-electronics:  #9356b4;  /* Purple  — Recyclable / electronics */
+  --cat-hhw:          #e04030;  /* Red     — Waste / hazardous */
+}
