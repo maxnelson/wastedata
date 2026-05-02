@@ -27,6 +27,10 @@
   --space-8: 32px;
   --space-10: 40px;
   --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-28: 112px;
 
   /* ── Radius ────────────────────────────────────────────── */
   --radius-sm: 4px;
