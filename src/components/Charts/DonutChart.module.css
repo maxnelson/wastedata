@@ -8,7 +8,7 @@
 }
 
 .segment {
-  cursor: pointer;
+  pointer-events: none;
   transition: transform 0.18s ease;
 }
 

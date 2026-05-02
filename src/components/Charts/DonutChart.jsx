@@ -52,11 +52,28 @@ function arcPath(cx, cy, outerR, innerR, startDeg, endDeg) {
 export default function DonutChart({ categories }) {
   const defaultIdx = categories.reduce((best, cat, i) => cat.pct > categories[best].pct ? i : best, 0)
   const [selectedIdx, setSelectedIdx] = useState(defaultIdx)
+  const [hoveredIdx, setHoveredIdx]   = useState(null)
   const [infoOpen, setInfoOpen]       = useState(false)
 
-  function selectSegment(i, isSelected) {
-    if (isSelected) return          // clicking the active segment does nothing
-    setSelectedIdx(i)
+  const activeIdx = hoveredIdx !== null ? hoveredIdx : selectedIdx
+
+  function handleSvgMouseMove(e) {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const svgX = (e.clientX - rect.left) / rect.width  * 400
+    const svgY = (e.clientY - rect.top)  / rect.height * 400
+    const dx = svgX - CX
+    const dy = svgY - CY
+    const dist = Math.sqrt(dx * dx + dy * dy)
+    if (dist < HOLE || dist > R) { setHoveredIdx(null); return }
+    let angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90
+    if (angle < 0) angle += 360
+    let cur = 0
+    for (let i = 0; i < categories.length; i++) {
+      const span = (categories[i].pct / 100) * 360
+      if (angle >= cur && angle < cur + span) { setHoveredIdx(i); return }
+      cur += span
+    }
+    setHoveredIdx(null)
   }
 
   // Pre-compute angular spans, accumulating from 0°
@@ -73,7 +90,7 @@ export default function DonutChart({ categories }) {
     const dx     = Math.cos(midRad) * EXPLODE
     const dy     = Math.sin(midRad) * EXPLODE
 
-    const isSelected = selectedIdx === i
+    const isActive = activeIdx === i
     const d = arcPath(CX, CY, R, HOLE, startDeg, endDeg)
 
     return (
@@ -81,16 +98,16 @@ export default function DonutChart({ categories }) {
         key={cat.name}
         d={d}
         fill={cat.color}
-        stroke={isSelected ? '#ffe033' : 'none'}
-        strokeWidth={isSelected ? 5 : 0}
-        className={`${styles.segment} ${isSelected ? styles.segmentSelected : ''}`}
-        transform={isSelected ? `translate(${dx}, ${dy})` : undefined}
-        onClick={() => selectSegment(i, isSelected)}
+        stroke={isActive ? '#ffe033' : 'none'}
+        strokeWidth={isActive ? 5 : 0}
+        className={`${styles.segment} ${isActive ? styles.segmentSelected : ''}`}
+        transform={isActive ? `translate(${dx}, ${dy})` : undefined}
+        onClick={() => { if (selectedIdx !== i) setSelectedIdx(i) }}
       />
     )
   })
 
-  const selected    = selectedIdx !== null ? categories[selectedIdx] : null
+  const selected    = activeIdx !== null ? categories[activeIdx] : null
   const pctLabel    = selected
     ? (Number.isInteger(selected.pct) ? `${selected.pct}%` : `${selected.pct.toFixed(1)}%`)
     : null
@@ -102,8 +119,10 @@ export default function DonutChart({ categories }) {
         viewBox="0 0 400 400"
         width="100%"
         overflow="visible"
-        style={{ display: 'block' }}
+        style={{ display: 'block', cursor: hoveredIdx !== null ? 'pointer' : 'default' }}
         className={styles.donut}
+        onMouseMove={handleSvgMouseMove}
+        onMouseLeave={() => setHoveredIdx(null)}
       >
         {segments}
 
