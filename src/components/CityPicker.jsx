@@ -219,6 +219,7 @@ export default function CityPicker({ value, onChange, excludeCity, openOnMount, 
                   i === activeIdx ? styles.optionActive    : '',
                 ].join(' ')}
                 disabled={!r.hasData}
+                onPointerDown={e => e.preventDefault()}
                 onClick={() => r.hasData && handleSelect(r)}
               >
                 {isSelected && <span className={styles.optionCheck}><CheckIcon /></span>}

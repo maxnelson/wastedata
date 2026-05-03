@@ -228,6 +228,7 @@
   height: 20px;
   overflow: visible;
   pointer-events: none;
+  cursor: default;
 }
 
 .markerPin {

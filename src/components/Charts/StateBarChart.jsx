@@ -64,6 +64,7 @@ export default function StateBarChart({
   const chartAreaRef = useRef(null)
   const zoomStateRef = useRef({ cities: [], validBrush: null })
   const lastZoomRef  = useRef(0)
+  const didDragRef   = useRef(false)
 
   const { disposalByJurisdiction, populationData } = useAppData()
   const { year, quarter } = useFilter()
@@ -184,9 +185,11 @@ export default function StateBarChart({
     const startX     = e.clientX
     const startBrush = { ...zoomStateRef.current.validBrush }
     const totalCount = zoomStateRef.current.cities.length
+    didDragRef.current = false
     setIsPanning(true)
 
     function onMove(ev) {
+      if (Math.abs(ev.clientX - startX) > 4) didDragRef.current = true
       const rect = chartAreaRef.current?.getBoundingClientRect()
       if (!rect) return
       const count       = startBrush.end - startBrush.start + 1
@@ -337,6 +340,7 @@ export default function StateBarChart({
                     onMouseEnter={() => setHoveredCity(city)}
                     onMouseLeave={() => setHoveredCity(null)}
                     onClick={() => {
+                      if (didDragRef.current) return
                       if (!onCitySelect) return
                       if (city.name === selectedName || city.name === compareNameB) return
                       onCitySelect({ city: city.name, state: 'CA', key: `${city.name}|CA` })
