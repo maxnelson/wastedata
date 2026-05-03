@@ -218,13 +218,14 @@ export default function StateBarChart({
     .filter(Boolean)
     .filter((n, i, arr) => arr.indexOf(n) === i)
     .map(name => {
+      const color   = name === selectedName ? accentColor : compareAccentColor
       const cityIdx = cities.findIndex(c => c.name === name)
       if (cityIdx === -1) return null
-      if (cityIdx < rangeStart) return { name, side: 'left' }
-      if (cityIdx > rangeEnd)   return { name, side: 'right' }
+      if (cityIdx < rangeStart) return { name, side: 'left', color }
+      if (cityIdx > rangeEnd)   return { name, side: 'right', color }
       const idx = cityIdx - rangeStart
       const pct = (idx + 0.5) / visibleCities.length * 100
-      return { name, side: 'center', pct }
+      return { name, side: 'center', pct, color }
     })
     .filter(Boolean)
 
@@ -361,33 +362,38 @@ export default function StateBarChart({
         <div className={styles.markerRow}>
           {markerData.some(m => m.side === 'left') && (
             <div className={styles.markerEdgeLeft}>
-              {markerData.filter(m => m.side === 'left').map(({ name }) => (
+              {markerData.filter(m => m.side === 'left').map(({ name, color }) => (
                 <div key={name} className={styles.markerPinEdge}>
-                  <span className={styles.markerDot} />
+                  <span className={styles.markerDot} style={{ background: color }} />
                   <span className={styles.markerLabel}>{name}</span>
                 </div>
               ))}
             </div>
           )}
-          {markerData.filter(m => m.side === 'center').map(({ name, pct }) => {
-            const flipRight = pct < 20
-            return (
-              <div
-                key={name}
-                className={`${styles.markerPin} ${flipRight ? styles.markerPinRight : ''}`}
-                style={{ left: `calc(${pct}% ${flipRight ? '- 4px' : '+ 4px'})` }}
-              >
-                <span className={styles.markerLabel}>{name}</span>
-                <span className={styles.markerDot} />
-              </div>
-            )
-          })}
+          {markerData
+            .filter(m => m.side === 'center')
+            .sort((a, b) => a.pct - b.pct)
+            .map(({ name, pct, color }, i, arr) => {
+              // single marker: flip if near left edge; two markers: rightmost flips right
+              // so both labels always point away from each other and can never overlap
+              const flipRight = arr.length > 1 ? i === arr.length - 1 : pct < 20
+              return (
+                <div
+                  key={name}
+                  className={`${styles.markerPin} ${flipRight ? styles.markerPinRight : ''}`}
+                  style={{ left: `calc(${pct}% ${flipRight ? '- 4px' : '+ 4px'})` }}
+                >
+                  <span className={styles.markerLabel}>{name}</span>
+                  <span className={styles.markerDot} style={{ background: color }} />
+                </div>
+              )
+            })}
           {markerData.some(m => m.side === 'right') && (
             <div className={styles.markerEdgeRight}>
-              {markerData.filter(m => m.side === 'right').map(({ name }) => (
+              {markerData.filter(m => m.side === 'right').map(({ name, color }) => (
                 <div key={name} className={styles.markerPinEdge}>
                   <span className={styles.markerLabel}>{name}</span>
-                  <span className={styles.markerDot} />
+                  <span className={styles.markerDot} style={{ background: color }} />
                 </div>
               ))}
             </div>
