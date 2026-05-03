@@ -91,6 +91,7 @@ export default function CityPicker({ value, onChange, excludeCity, openOnMount, 
         url.searchParams.set('format', 'json')
         url.searchParams.set('limit', '12')
         url.searchParams.set('accept-language', 'en')
+        url.searchParams.set('countrycodes', 'us')
 
         const res  = await fetch(url.toString(), { signal: controller.signal })
         const data = await res.json()
@@ -115,6 +116,7 @@ export default function CityPicker({ value, onChange, excludeCity, openOnMount, 
             return { city, state: stateCode, country, key: resolvedKey, hasData }
           })
           .filter(Boolean)
+          .filter(r => r.state === 'CA')
 
         setResults(mapped)
         setLoading(false)
