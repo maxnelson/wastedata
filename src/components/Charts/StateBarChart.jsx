@@ -114,11 +114,11 @@ export default function StateBarChart({
   // Keep ref current so wheel/touch handlers always read fresh state without re-attaching
   useEffect(() => { zoomStateRef.current = { cities, validBrush } }, [cities, validBrush])
 
-  function cityInfoStr(city) {
+  function cityInfoJsx(city) {
     const popPart   = city.pop      ? ` (${Math.round(city.pop).toLocaleString()} people)` : ''
     const totalPart = `${Math.round(city.total).toLocaleString()} tons total`
     const pcPart    = city.perCapita ? ` — ${city.perCapita} lbs/person/day` : ''
-    return `${city.name}${popPart}: ${totalPart}${pcPart}`
+    return <><strong>{city.name}</strong>{popPart}: {totalPart}{pcPart}</>
   }
 
   // ── Scroll-to-zoom (non-passive so preventDefault works) ──
@@ -214,11 +214,17 @@ export default function StateBarChart({
 
   const rangeStart = validBrush?.start ?? 0
   const rangeEnd   = validBrush?.end   ?? cities.length - 1
-  const markerData = [selectedName, compareNameB]
+
+  const markerSources = [
+    selectedName  ? { name: selectedName,  color: accentColor }        : null,
+    compareNameB  ? { name: compareNameB,  color: compareAccentColor } : null,
+    hoveredCity   ? { name: hoveredCity.name, color: getCityColor(`${hoveredCity.name}|CA`) } : null,
+  ]
     .filter(Boolean)
-    .filter((n, i, arr) => arr.indexOf(n) === i)
-    .map(name => {
-      const color   = name === selectedName ? accentColor : compareAccentColor
+    .filter((item, i, arr) => arr.findIndex(x => x.name === item.name) === i)
+
+  const markerData = markerSources
+    .map(({ name, color }) => {
       const cityIdx = cities.findIndex(c => c.name === name)
       if (cityIdx === -1) return null
       if (cityIdx < rangeStart) return { name, side: 'left', color }
@@ -278,13 +284,10 @@ export default function StateBarChart({
       {/* Row 1 + 2: always-visible selected cities; Row 3: hovered city */}
       <div className={styles.infoSection}>
         <div className={styles.infoRow}>
-          {cityAEntry && <span>{cityInfoStr(cityAEntry)}</span>}
+          {cityAEntry && <span>{cityInfoJsx(cityAEntry)}</span>}
         </div>
         <div className={styles.infoRow}>
-          {cityBEntry && <span>{cityInfoStr(cityBEntry)}</span>}
-        </div>
-        <div className={styles.infoRow}>
-          {hoveredCity && <span>{cityInfoStr(hoveredCity)}</span>}
+          {cityBEntry && <span>{cityInfoJsx(cityBEntry)}</span>}
         </div>
       </div>
 
