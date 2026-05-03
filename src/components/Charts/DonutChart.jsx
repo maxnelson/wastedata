@@ -76,6 +76,24 @@ export default function DonutChart({ categories }) {
     setHoveredIdx(null)
   }
 
+  function handleSvgClick(e) {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const svgX = (e.clientX - rect.left) / rect.width  * 400
+    const svgY = (e.clientY - rect.top)  / rect.height * 400
+    const dx = svgX - CX
+    const dy = svgY - CY
+    const dist = Math.sqrt(dx * dx + dy * dy)
+    if (dist < HOLE || dist > R) return
+    let angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90
+    if (angle < 0) angle += 360
+    let cur = 0
+    for (let i = 0; i < categories.length; i++) {
+      const span = (categories[i].pct / 100) * 360
+      if (angle >= cur && angle < cur + span) { setSelectedIdx(i); return }
+      cur += span
+    }
+  }
+
   // Pre-compute angular spans, accumulating from 0°
   let cursor = 0
   const segments = categories.map((cat, i) => {
@@ -102,7 +120,6 @@ export default function DonutChart({ categories }) {
         strokeWidth={isActive ? 5 : 0}
         className={`${styles.segment} ${isActive ? styles.segmentSelected : ''}`}
         transform={isActive ? `translate(${dx}, ${dy})` : undefined}
-        onClick={() => { if (selectedIdx !== i) setSelectedIdx(i) }}
       />
     )
   })
@@ -121,6 +138,7 @@ export default function DonutChart({ categories }) {
         overflow="visible"
         style={{ display: 'block', cursor: hoveredIdx !== null ? 'pointer' : 'default' }}
         className={styles.donut}
+        onClick={handleSvgClick}
         onMouseMove={handleSvgMouseMove}
         onMouseLeave={() => setHoveredIdx(null)}
       >

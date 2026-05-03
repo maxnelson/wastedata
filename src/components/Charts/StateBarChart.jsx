@@ -6,13 +6,7 @@ import styles from './StateBarChart.module.css'
 
 const STATE_NAMES = { CA: 'California' }
 const AVAILABLE_STATES = ['CA']
-
-function toIdx(svg, clientX, len) {
-  const rect = svg?.getBoundingClientRect()
-  if (!rect || len === 0) return 0
-  const pct = (clientX - rect.left) / rect.width
-  return Math.max(0, Math.min(len - 1, Math.floor(pct * len)))
-}
+const MIN_VISIBLE = 5
 
 function getHeightPct(value, scaleMode, effectiveMax, capVal) {
   if (scaleMode === 'log')
@@ -22,17 +16,46 @@ function getHeightPct(value, scaleMode, effectiveMax, capVal) {
   return (value / effectiveMax) * 100
 }
 
+function applyZoom(cities, currentBrush, deltaY, chartEl, clientX) {
+  const totalCount = cities.length
+  if (totalCount === 0) return null
+
+  const currentStart = currentBrush?.start ?? 0
+  const currentEnd   = currentBrush?.end   ?? totalCount - 1
+  const currentCount = currentEnd - currentStart + 1
+
+  const factor       = deltaY > 0 ? 1.15 : 1 / 1.15
+  const newCount     = Math.round(currentCount * factor)
+  const clampedCount = Math.max(MIN_VISIBLE, Math.min(totalCount, newCount))
+
+  const rect      = chartEl.getBoundingClientRect()
+  const pct       = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
+  const anchorIdx = currentStart + Math.round(pct * (currentCount - 1))
+
+  const before = Math.round(pct * (clampedCount - 1))
+  let newStart = anchorIdx - before
+  let newEnd   = newStart + clampedCount - 1
+
+  if (newStart < 0)           { newEnd  -= newStart; newStart = 0 }
+  if (newEnd >= totalCount)   { newStart -= (newEnd - totalCount + 1); newEnd = totalCount - 1 }
+  newStart = Math.max(0, newStart)
+  newEnd   = Math.min(totalCount - 1, newEnd)
+
+  if (newEnd - newStart + 1 >= totalCount) return null
+  return { start: newStart, end: newEnd }
+}
+
 export default function StateBarChart({ cityObj, accentColor = 'var(--accent-color)' }) {
   const [selectedState, setSelectedState] = useState(cityObj?.state ?? 'CA')
   const [mode, setMode]                   = useState('perCapita')
   const [hoveredCity, setHoveredCity]     = useState(null)
   const [scaleMode, setScaleMode]         = useState('normal')
   const [brushRange, setBrushRange]       = useState(null)
-  const [dragPreview, setDragPreview]     = useState(null)
   const [pinnedCities, setPinnedCities]   = useState([])
+  const [isPanning, setIsPanning]         = useState(false)
 
-  const dragRef = useRef({ active: false })
-  const svgRef  = useRef(null)
+  const chartAreaRef = useRef(null)
+  const zoomStateRef = useRef({ cities: [], validBrush: null })
 
   const { disposalByJurisdiction, populationData } = useAppData()
   const { year, quarter } = useFilter()
@@ -75,54 +98,107 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
 
   const effectiveMax = visibleCities[0]?.value ?? 1
 
+  // Keep ref current so wheel/touch handlers always read fresh state without re-attaching
+  useEffect(() => { zoomStateRef.current = { cities, validBrush } }, [cities, validBrush])
+
   function valueStr(city) {
     return mode === 'perCapita'
       ? `${city.value} lbs/person/day`
       : `${Math.round(city.value).toLocaleString()} tons`
   }
 
-  // ── Brush interaction ────────────────────────────────────────
-  function handleBrushMouseDown(e) {
+  // ── Scroll-to-zoom (non-passive so preventDefault works) ──
+  useEffect(() => {
+    const el = chartAreaRef.current
+    if (!el) return
+    function handleWheel(e) {
+      e.preventDefault()
+      const { cities, validBrush } = zoomStateRef.current
+      setBrushRange(applyZoom(cities, validBrush, e.deltaY, el, e.clientX))
+    }
+    el.addEventListener('wheel', handleWheel, { passive: false })
+    return () => el.removeEventListener('wheel', handleWheel)
+  }, [])
+
+  // ── Pinch-to-zoom (mobile) ────────────────────────────────
+  useEffect(() => {
+    const el = chartAreaRef.current
+    if (!el) return
+    let lastDist = null
+
+    function dist(touches) {
+      const dx = touches[0].clientX - touches[1].clientX
+      const dy = touches[0].clientY - touches[1].clientY
+      return Math.sqrt(dx * dx + dy * dy)
+    }
+
+    function onTouchStart(e) {
+      if (e.touches.length === 2) { e.preventDefault(); lastDist = dist(e.touches) }
+    }
+    function onTouchMove(e) {
+      if (e.touches.length !== 2 || lastDist === null) return
+      e.preventDefault()
+      const d       = dist(e.touches)
+      const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2
+      const { cities, validBrush } = zoomStateRef.current
+      // growing distance = fingers spreading = zoom in → negative pseudoDelta
+      setBrushRange(applyZoom(cities, validBrush, d < lastDist ? 20 : -20, el, centerX))
+      lastDist = d
+    }
+    function onTouchEnd() { lastDist = null }
+
+    el.addEventListener('touchstart', onTouchStart, { passive: false })
+    el.addEventListener('touchmove',  onTouchMove,  { passive: false })
+    el.addEventListener('touchend',   onTouchEnd)
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart)
+      el.removeEventListener('touchmove',  onTouchMove)
+      el.removeEventListener('touchend',   onTouchEnd)
+    }
+  }, [])
+
+  // ── Drag-to-pan ───────────────────────────────────────────
+  function handlePanMouseDown(e) {
+    if (!zoomStateRef.current.validBrush) return
+    if (e.target.closest('button')) return
     e.preventDefault()
-    const svg       = svgRef.current
-    const len       = cities.length
-    const startIdx  = toIdx(svg, e.clientX, len)
-    dragRef.current = { active: true }
-    setDragPreview({ start: startIdx, end: startIdx })
+
+    const startX     = e.clientX
+    const startBrush = { ...zoomStateRef.current.validBrush }
+    const totalCount = zoomStateRef.current.cities.length
+    setIsPanning(true)
 
     function onMove(ev) {
-      const idx   = toIdx(svg, ev.clientX, len)
-      const start = Math.min(startIdx, idx)
-      const end   = Math.max(startIdx, idx)
-      setDragPreview({ start, end })
+      const rect = chartAreaRef.current?.getBoundingClientRect()
+      if (!rect) return
+      const count       = startBrush.end - startBrush.start + 1
+      const deltaCities = Math.round(((ev.clientX - startX) / rect.width) * count)
+      let newStart = startBrush.start - deltaCities
+      let newEnd   = startBrush.end   - deltaCities
+      if (newStart < 0)         { newEnd -= newStart; newStart = 0 }
+      if (newEnd >= totalCount) { newStart -= (newEnd - totalCount + 1); newEnd = totalCount - 1 }
+      setBrushRange({ start: Math.max(0, newStart), end: Math.min(totalCount - 1, newEnd) })
     }
-    function onUp(ev) {
+    function onUp() {
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseup',   onUp)
-      dragRef.current.active = false
-      dragRef.current.cleanup = null
-      const idx   = toIdx(svg, ev.clientX, len)
-      const start = Math.min(startIdx, idx)
-      const end   = Math.max(startIdx, idx)
-      setDragPreview(null)
-      setBrushRange(end - start < 2 ? null : { start, end })
-    }
-    dragRef.current.cleanup = () => {
-      window.removeEventListener('mousemove', onMove)
-      window.removeEventListener('mouseup',   onUp)
+      setIsPanning(false)
     }
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseup',   onUp)
   }
 
-  function handleBrushClear() { setBrushRange(null); setDragPreview(null) }
+  // Position strip: fraction of full dataset currently visible
+  const stripLeft  = validBrush ? (validBrush.start / cities.length) * 100 : 0
+  const stripWidth = validBrush
+    ? ((validBrush.end - validBrush.start + 1) / cities.length) * 100
+    : 100
 
-  useEffect(() => () => { dragRef.current.cleanup?.() }, [])
-
-  // ── Mini chart values ────────────────────────────────────────
-  const miniMaxVal = cities[0]?.value ?? 1
-  const miniBarW   = cities.length > 0 ? 600 / cities.length : 1
-  const activeOverlay = dragPreview ?? validBrush
+  const chartCursorClass = isPanning
+    ? styles.chartPanning
+    : validBrush
+      ? styles.chartZoomed
+      : styles.chartDefault
 
   return (
     <div className={styles.section}>
@@ -141,13 +217,13 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
         <div className={styles.tabGroup}>
           <button
             className={`${styles.tab} ${mode === 'perCapita' ? styles.tabActive : ''}`}
-            onClick={() => { setMode('perCapita'); setBrushRange(null); setDragPreview(null) }}
+            onClick={() => { setMode('perCapita'); setBrushRange(null) }}
           >
             Per Capita
           </button>
           <button
             className={`${styles.tab} ${mode === 'volume' ? styles.tabActive : ''}`}
-            onClick={() => { setMode('volume'); setBrushRange(null); setDragPreview(null) }}
+            onClick={() => { setMode('volume'); setBrushRange(null) }}
           >
             Total Volume
           </button>
@@ -180,7 +256,11 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
       </div>
 
       {/* Main bar chart */}
-      <div className={styles.chartArea}>
+      <div
+        ref={chartAreaRef}
+        className={`${styles.chartArea} ${chartCursorClass}`}
+        onMouseDown={handlePanMouseDown}
+      >
         {scaleMode !== 'normal' && (
           <div className={styles.scaleBadge}>
             {scaleMode === 'log' ? 'Log scale' : 'Capped at p98'}
@@ -189,6 +269,12 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
         {validBrush && (
           <div className={styles.brushBadge}>
             {validBrush.end - validBrush.start + 1} cities
+            <button
+              className={styles.brushClearInline}
+              onClick={() => setBrushRange(null)}
+            >
+              ×
+            </button>
           </div>
         )}
         <div className={styles.scrollContainer}>
@@ -241,52 +327,17 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
         </div>
       </div>
 
-      {/* Mini overview chart + brush */}
-      <div className={styles.miniChartWrapper}>
-        <div className={styles.miniChartHeader}>
-          <span className={styles.miniChartLabel}>Overview — drag to zoom</span>
-          {validBrush && (
-            <button className={styles.brushClear} onClick={handleBrushClear}>
-              × Clear zoom
-            </button>
-          )}
+      {/* Position strip + hint */}
+      <div className={styles.zoomFooter}>
+        <div className={styles.positionStrip}>
+          <div
+            className={styles.positionThumb}
+            style={{ left: `${stripLeft}%`, width: `${stripWidth}%` }}
+          />
         </div>
-        <svg
-          ref={svgRef}
-          className={styles.miniChart}
-          viewBox="0 0 600 40"
-          width="100%"
-          height="40"
-          onMouseDown={handleBrushMouseDown}
-          onDoubleClick={handleBrushClear}
-        >
-          <rect x="0" y="0" width="600" height="40" fill="var(--surface-base)" />
-          {cities.map((city, i) => {
-            const bh = (city.value / miniMaxVal) * 38
-            return (
-              <rect
-                key={city.name}
-                x={i * miniBarW}
-                y={40 - bh}
-                width={Math.max(miniBarW - 0.5, 0.5)}
-                height={bh}
-                fill={getCityColor(`${city.name}|CA`)}
-                opacity={0.55}
-              />
-            )
-          })}
-          {activeOverlay && (() => {
-            const x1 = activeOverlay.start * miniBarW
-            const x2 = (activeOverlay.end + 1) * miniBarW
-            return (
-              <>
-                <rect x="0" y="0" width={x1} height="40" fill="white" opacity="0.6" />
-                <rect x={x2} y="0" width={Math.max(600 - x2, 0)} height="40" fill="white" opacity="0.6" />
-                <rect x={x1} y="0" width={x2 - x1} height="40" fill="none" stroke="var(--gray-500)" strokeWidth="1" />
-              </>
-            )
-          })()}
-        </svg>
+        <span className={styles.zoomHint}>
+          {validBrush ? 'Drag to pan · Scroll to zoom' : 'Scroll to zoom'}
+        </span>
       </div>
     </div>
   )
