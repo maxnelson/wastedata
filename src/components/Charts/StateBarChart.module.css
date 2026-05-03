@@ -213,6 +213,10 @@
   opacity: 1;
 }
 
+.barCompare {
+  opacity: 1;
+}
+
 .axisLine {
   height: 1px;
   background: var(--border-subtle);

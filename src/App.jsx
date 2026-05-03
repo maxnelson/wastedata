@@ -52,6 +52,19 @@ function CompareView() {
     : perfA === 'worse'
       ? 'var(--perf-worse)'
       : 'var(--brand-600)'
+  const accentColorB = perfA === 'better'
+    ? 'var(--perf-worse)'
+    : perfA === 'worse'
+      ? 'var(--perf-better)'
+      : 'var(--brand-600)'
+
+  function handleBarChartCitySelect(newCityObj) {
+    // Cycle: (A, B) + click C → (B, C)
+    navigate(
+      `/compare/${cityObjToSegment(jurisdictions, cityB)}/${cityObjToSegment(jurisdictions, newCityObj)}`,
+      { replace: true }
+    )
+  }
 
   return (
     <div className={styles.root}>
@@ -102,9 +115,15 @@ function CompareView() {
             </div>
           </div>
 
-          {/* Row 4: unified state bar chart (City A highlighted) */}
+          {/* Row 4: unified state bar chart — both cities highlighted, clicking cycles cityB */}
           <div className={styles.fullWidthSection}>
-            <StateBarChart cityObj={cityA} accentColor={accentColorA} />
+            <StateBarChart
+              cityObj={cityA}
+              accentColor={accentColorA}
+              compareCityObj={cityB}
+              compareAccentColor={accentColorB}
+              onCitySelect={handleBarChartCitySelect}
+            />
           </div>
         </Layout>
         </FilterProvider>

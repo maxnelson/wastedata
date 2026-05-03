@@ -47,13 +47,18 @@ function applyZoom(cities, currentBrush, deltaY, chartEl, clientX) {
   return { start: newStart, end: newEnd }
 }
 
-export default function StateBarChart({ cityObj, accentColor = 'var(--accent-color)' }) {
+export default function StateBarChart({
+  cityObj,
+  accentColor        = 'var(--accent-color)',
+  compareCityObj     = null,
+  compareAccentColor = 'var(--accent-color)',
+  onCitySelect       = null,
+}) {
   const [selectedState, setSelectedState] = useState(cityObj?.state ?? 'CA')
   const [mode, setMode]                   = useState('perCapita')
   const [hoveredCity, setHoveredCity]     = useState(null)
   const [scaleMode, setScaleMode]         = useState('normal')
   const [brushRange, setBrushRange]       = useState(null)
-  const [pinnedCities, setPinnedCities]   = useState([])
   const [isPanning, setIsPanning]         = useState(false)
 
   const chartAreaRef = useRef(null)
@@ -66,6 +71,7 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
 
   const effectiveState = cityObj?.state ?? selectedState
   const selectedName   = cityObj?.city ?? null
+  const compareNameB   = compareCityObj?.city ?? null
 
   const cities = useMemo(() => {
     const entries = []
@@ -100,6 +106,10 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
   }, [cities, validBrush])
 
   const effectiveMax = visibleCities[0]?.value ?? 1
+
+  // Always look up from the full cities array so info rows work even when zoomed away
+  const cityAEntry = selectedName  ? (cities.find(c => c.name === selectedName)  ?? null) : null
+  const cityBEntry = compareNameB  ? (cities.find(c => c.name === compareNameB)  ?? null) : null
 
   // Keep ref current so wheel/touch handlers always read fresh state without re-attaching
   useEffect(() => { zoomStateRef.current = { cities, validBrush } }, [cities, validBrush])
@@ -248,13 +258,17 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
         </div>
       </div>
 
-      {/* Two fixed info rows: row1=pinned[0], row2=hovered??pinned[1] */}
+      {/* Row 1 + 2: always-visible selected cities; Row 3: hovered city */}
       <div className={styles.infoSection}>
-        {[hoveredCity ?? pinnedCities[1], pinnedCities[0]].map((city, i) => (
-          <div key={i} className={styles.infoRow}>
-            {city && <span>{cityInfoStr(city)}</span>}
-          </div>
-        ))}
+        <div className={styles.infoRow}>
+          {cityAEntry && <span>{cityInfoStr(cityAEntry)}</span>}
+        </div>
+        <div className={styles.infoRow}>
+          {cityBEntry && <span>{cityInfoStr(cityBEntry)}</span>}
+        </div>
+        <div className={styles.infoRow}>
+          {hoveredCity && <span>{cityInfoStr(hoveredCity)}</span>}
+        </div>
       </div>
 
       {/* Main bar chart */}
@@ -286,7 +300,7 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
                 <div className={styles.noData}>No data for {quarter} {year}</div>
               ) : visibleCities.map(city => {
                 const isSelected = city.name === selectedName
-                const isPinned   = pinnedCities.some(c => c.name === city.name)
+                const isCompare  = city.name === compareNameB
                 const isHovered  = hoveredCity?.name === city.name
                 const heightPct  = getHeightPct(city.value, scaleMode, effectiveMax, capVal)
                 const isCapped   = scaleMode === 'capped' && city.value > capVal
@@ -303,19 +317,20 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
                     onMouseEnter={() => setHoveredCity(city)}
                     onMouseLeave={() => setHoveredCity(null)}
                     onClick={() => {
-                      setPinnedCities(prev => {
-                        const alreadyIdx = prev.findIndex(c => c.name === city.name)
-                        if (alreadyIdx !== -1) return prev.filter((_, i) => i !== alreadyIdx)
-                        if (prev.length < 2) return [...prev, city]
-                        return [prev[1], city]
-                      })
+                      if (!onCitySelect) return
+                      if (city.name === selectedName || city.name === compareNameB) return
+                      onCitySelect({ city: city.name, state: 'CA', key: `${city.name}|CA` })
                     }}
                   >
                     <div
-                      className={`${styles.bar} ${isSelected ? styles.barSelected : ''} ${isPinned ? styles.barPinned : ''} ${isHovered && !isPinned ? styles.barHovered : ''}`}
+                      className={`${styles.bar} ${isSelected ? styles.barSelected : ''} ${isCompare ? styles.barCompare : ''} ${isHovered && !isSelected && !isCompare ? styles.barHovered : ''}`}
                       style={{
                         height: `${heightPct}%`,
-                        background: isSelected ? accentColor : getCityColor(`${city.name}|CA`),
+                        background: isSelected
+                          ? accentColor
+                          : isCompare
+                            ? compareAccentColor
+                            : getCityColor(`${city.name}|CA`),
                       }}
                     >
                       {isCapped && <div className={styles.overflowIndicator} />}
@@ -328,10 +343,10 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
           </div>
         </div>
         <div className={styles.markerRow}>
-          {[
-            ...pinnedCities.map(c => c.name),
-            ...(selectedName ? [selectedName] : []),
-          ].filter((n, i, arr) => arr.indexOf(n) === i).map(name => {
+          {[selectedName, compareNameB]
+            .filter(Boolean)
+            .filter((n, i, arr) => arr.indexOf(n) === i)
+            .map(name => {
             const idx = visibleCities.findIndex(c => c.name === name)
             if (idx === -1) return null
             const pct      = (idx + 0.5) / visibleCities.length * 100
