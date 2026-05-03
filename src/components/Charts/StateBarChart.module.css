@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  padding-bottom: var(--space-8);
 }
 
 .header {
@@ -76,14 +77,13 @@
 
 /* ─── Scrollable chart area ──────────────────────────────── */
 .scrollContainer {
-  overflow-x: scroll;
-  overflow-y: hidden;
+  overflow: hidden;
 }
 
 .chartInner {
   display: flex;
   flex-direction: column;
-  min-width: max-content;
+  width: 100%;
 }
 
 .noData {
@@ -164,53 +164,20 @@
   opacity: 1;
 }
 
-/* ─── Zoom footer: position strip + hint ─────────────────── */
-.zoomFooter {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-top: calc(var(--space-1) * -1);
-}
-
-.positionStrip {
-  flex: 1;
-  height: 3px;
-  background: var(--gray-100);
-  border-radius: 2px;
-  position: relative;
-  overflow: hidden;
-}
-
-.positionThumb {
-  position: absolute;
-  top: 0;
-  height: 100%;
-  background: var(--gray-400);
-  border-radius: 2px;
-}
-
-.zoomHint {
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-  font-weight: 500;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
 
 /* ─── Bars ───────────────────────────────────────────────── */
 .barTrack {
   display: flex;
   align-items: flex-end;
   height: 160px;
-  gap: 1px;
 }
 
 .barCol {
-  width: 15px;
+  flex: 1;
+  min-width: 1px;
   height: 100%;
   display: flex;
   align-items: flex-end;
-  flex-shrink: 0;
   cursor: pointer;
 }
 
@@ -249,4 +216,56 @@
 .axisLine {
   height: 1px;
   background: var(--border-subtle);
+}
+
+/* ─── City markers below axis ───────────────────────────── */
+.markerRow {
+  position: relative;
+  height: 20px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.markerPin {
+  position: absolute;
+  top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transform: translateX(-100%);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Flip label to the right when bar is near the left edge */
+.markerPinRight {
+  transform: translateX(0);
+  flex-direction: row-reverse;
+}
+
+.markerLabel {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.markerDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f5c542;
+  flex-shrink: 0;
+}
+
+/* ─── Zoom hint ──────────────────────────────────────────── */
+.zoomHint {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0;
+  margin-top: var(--space-1);
+  user-select: none;
+  pointer-events: none;
 }

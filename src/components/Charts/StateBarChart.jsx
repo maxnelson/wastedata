@@ -24,8 +24,10 @@ function applyZoom(cities, currentBrush, deltaY, chartEl, clientX) {
   const currentEnd   = currentBrush?.end   ?? totalCount - 1
   const currentCount = currentEnd - currentStart + 1
 
-  const factor       = deltaY > 0 ? 1.15 : 1 / 1.15
-  const newCount     = Math.round(currentCount * factor)
+  // ceil/floor guarantees at least 1 step even for small counts where round(N * 1.06) === N
+  const newCount = deltaY > 0
+    ? Math.ceil(currentCount * 1.06)
+    : Math.floor(currentCount / 1.06)
   const clampedCount = Math.max(MIN_VISIBLE, Math.min(totalCount, newCount))
 
   const rect      = chartEl.getBoundingClientRect()
@@ -56,6 +58,7 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
 
   const chartAreaRef = useRef(null)
   const zoomStateRef = useRef({ cities: [], validBrush: null })
+  const lastZoomRef  = useRef(0)
 
   const { disposalByJurisdiction, populationData } = useAppData()
   const { year, quarter } = useFilter()
@@ -70,13 +73,13 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
       if (effectiveState !== 'CA') continue
       const record = records.find(r => r.year === year && r.quarter === qNum)
       if (!record || record.total == null) continue
+      const pop      = populationData[name]?.pop?.[String(year)] ?? null
+      const perCapita = pop ? +((record.total * 2000) / 91.25 / pop).toFixed(2) : null
       if (mode === 'perCapita') {
-        const pop = populationData[name]?.pop?.[String(year)]
         if (!pop) continue
-        const perCapita = +((record.total * 2000) / 91.25 / pop).toFixed(2)
-        entries.push({ name, value: perCapita, total: record.total })
+        entries.push({ name, value: perCapita, total: record.total, pop, perCapita })
       } else {
-        entries.push({ name, value: record.total, total: record.total })
+        entries.push({ name, value: record.total, total: record.total, pop, perCapita })
       }
     }
     entries.sort((a, b) => b.value - a.value)
@@ -101,10 +104,11 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
   // Keep ref current so wheel/touch handlers always read fresh state without re-attaching
   useEffect(() => { zoomStateRef.current = { cities, validBrush } }, [cities, validBrush])
 
-  function valueStr(city) {
-    return mode === 'perCapita'
-      ? `${city.value} lbs/person/day`
-      : `${Math.round(city.value).toLocaleString()} tons`
+  function cityInfoStr(city) {
+    const popPart   = city.pop      ? ` (${Math.round(city.pop).toLocaleString()} people)` : ''
+    const totalPart = `${Math.round(city.total).toLocaleString()} tons total`
+    const pcPart    = city.perCapita ? ` — ${city.perCapita} lbs/person/day` : ''
+    return `${city.name}${popPart}: ${totalPart}${pcPart}`
   }
 
   // ── Scroll-to-zoom (non-passive so preventDefault works) ──
@@ -113,8 +117,12 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
     if (!el) return
     function handleWheel(e) {
       e.preventDefault()
+      if (e.deltaY === 0) return
+      const now = Date.now()
+      if (now - lastZoomRef.current < 80) return
+      lastZoomRef.current = now
       const { cities, validBrush } = zoomStateRef.current
-      setBrushRange(applyZoom(cities, validBrush, e.deltaY, el, e.clientX))
+      setBrushRange(applyZoom(cities, validBrush, Math.sign(e.deltaY), el, e.clientX))
     }
     el.addEventListener('wheel', handleWheel, { passive: false })
     return () => el.removeEventListener('wheel', handleWheel)
@@ -188,12 +196,6 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
     window.addEventListener('mouseup',   onUp)
   }
 
-  // Position strip: fraction of full dataset currently visible
-  const stripLeft  = validBrush ? (validBrush.start / cities.length) * 100 : 0
-  const stripWidth = validBrush
-    ? ((validBrush.end - validBrush.start + 1) / cities.length) * 100
-    : 100
-
   const chartCursorClass = isPanning
     ? styles.chartPanning
     : validBrush
@@ -250,7 +252,7 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
       <div className={styles.infoSection}>
         {[hoveredCity ?? pinnedCities[1], pinnedCities[0]].map((city, i) => (
           <div key={i} className={styles.infoRow}>
-            {city && <span><strong>{city.name}</strong>{' — '}{valueStr(city)}</span>}
+            {city && <span>{cityInfoStr(city)}</span>}
           </div>
         ))}
       </div>
@@ -266,17 +268,17 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
             {scaleMode === 'log' ? 'Log scale' : 'Capped at p98'}
           </div>
         )}
-        {validBrush && (
-          <div className={styles.brushBadge}>
-            {validBrush.end - validBrush.start + 1} cities
+        <div className={styles.brushBadge}>
+          {validBrush ? validBrush.end - validBrush.start + 1 : cities.length} cities
+          {validBrush && (
             <button
               className={styles.brushClearInline}
               onClick={() => setBrushRange(null)}
             >
               ×
             </button>
-          </div>
-        )}
+          )}
+        </div>
         <div className={styles.scrollContainer}>
           <div className={styles.chartInner}>
             <div className={styles.barTrack}>
@@ -325,20 +327,32 @@ export default function StateBarChart({ cityObj, accentColor = 'var(--accent-col
             <div className={styles.axisLine} />
           </div>
         </div>
+        <div className={styles.markerRow}>
+          {[
+            ...pinnedCities.map(c => c.name),
+            ...(selectedName ? [selectedName] : []),
+          ].filter((n, i, arr) => arr.indexOf(n) === i).map(name => {
+            const idx = visibleCities.findIndex(c => c.name === name)
+            if (idx === -1) return null
+            const pct      = (idx + 0.5) / visibleCities.length * 100
+            const flipRight = pct < 20
+            return (
+              <div
+                key={name}
+                className={`${styles.markerPin} ${flipRight ? styles.markerPinRight : ''}`}
+                style={{ left: `calc(${pct}% ${flipRight ? '- 4px' : '+ 4px'})` }}
+              >
+                <span className={styles.markerLabel}>{name}</span>
+                <span className={styles.markerDot} />
+              </div>
+            )
+          })}
+        </div>
       </div>
 
-      {/* Position strip + hint */}
-      <div className={styles.zoomFooter}>
-        <div className={styles.positionStrip}>
-          <div
-            className={styles.positionThumb}
-            style={{ left: `${stripLeft}%`, width: `${stripWidth}%` }}
-          />
-        </div>
-        <span className={styles.zoomHint}>
-          {validBrush ? 'Drag to pan · Scroll to zoom' : 'Scroll to zoom'}
-        </span>
-      </div>
+      <p className={styles.zoomHint}>
+        {validBrush ? 'Drag to pan · Scroll to zoom' : 'Scroll to zoom'}
+      </p>
     </div>
   )
 }
