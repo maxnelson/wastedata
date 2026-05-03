@@ -212,6 +212,22 @@ export default function StateBarChart({
       ? styles.chartZoomed
       : styles.chartDefault
 
+  const rangeStart = validBrush?.start ?? 0
+  const rangeEnd   = validBrush?.end   ?? cities.length - 1
+  const markerData = [selectedName, compareNameB]
+    .filter(Boolean)
+    .filter((n, i, arr) => arr.indexOf(n) === i)
+    .map(name => {
+      const cityIdx = cities.findIndex(c => c.name === name)
+      if (cityIdx === -1) return null
+      if (cityIdx < rangeStart) return { name, side: 'left' }
+      if (cityIdx > rangeEnd)   return { name, side: 'right' }
+      const idx = cityIdx - rangeStart
+      const pct = (idx + 0.5) / visibleCities.length * 100
+      return { name, side: 'center', pct }
+    })
+    .filter(Boolean)
+
   return (
     <div className={styles.section}>
       {/* Row 1: state selector + per-capita/volume toggle */}
@@ -343,13 +359,17 @@ export default function StateBarChart({
           </div>
         </div>
         <div className={styles.markerRow}>
-          {[selectedName, compareNameB]
-            .filter(Boolean)
-            .filter((n, i, arr) => arr.indexOf(n) === i)
-            .map(name => {
-            const idx = visibleCities.findIndex(c => c.name === name)
-            if (idx === -1) return null
-            const pct      = (idx + 0.5) / visibleCities.length * 100
+          {markerData.some(m => m.side === 'left') && (
+            <div className={styles.markerEdgeLeft}>
+              {markerData.filter(m => m.side === 'left').map(({ name }) => (
+                <div key={name} className={styles.markerPinEdge}>
+                  <span className={styles.markerDot} />
+                  <span className={styles.markerLabel}>{name}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          {markerData.filter(m => m.side === 'center').map(({ name, pct }) => {
             const flipRight = pct < 20
             return (
               <div
@@ -362,6 +382,16 @@ export default function StateBarChart({
               </div>
             )
           })}
+          {markerData.some(m => m.side === 'right') && (
+            <div className={styles.markerEdgeRight}>
+              {markerData.filter(m => m.side === 'right').map(({ name }) => (
+                <div key={name} className={styles.markerPinEdge}>
+                  <span className={styles.markerLabel}>{name}</span>
+                  <span className={styles.markerDot} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
