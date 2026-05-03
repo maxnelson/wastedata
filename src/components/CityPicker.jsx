@@ -1,13 +1,6 @@
-import { useState, useEffect, useLayoutEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import styles from './CityPicker.module.css'
 import { useAppData } from '../contexts/DataContext'
-
-// Maps Nominatim city names → CalRecycle jurisdiction names where they differ.
-// Add an entry here when searching a city shows it greyed-out despite having data.
-const NOMINATIM_TO_CALRECYCLE = {
-  'Ventura|CA':  'San Buenaventura|CA',
-  'Carmel|CA':   'Carmel-by-the-Sea|CA',
-}
 
 function CheckIcon() {
   return (
@@ -35,10 +28,20 @@ export default function CityPicker({ value, onChange, excludeCity, openOnMount, 
   const [open, setOpen]           = useState(false)
   const [query, setQuery]         = useState('')
   const [results, setResults]     = useState([])
-  const [loading, setLoading]     = useState(false)
   const [activeIdx, setActiveIdx] = useState(-1)
   const containerRef = useRef(null)
   const inputRef     = useRef(null)
+
+  // Sorted list of all CA cities built once from CITY_KEYS
+  const cityList = useMemo(() =>
+    Array.from(CITY_KEYS)
+      .map(key => {
+        const [city, state] = key.split('|')
+        return { city, state, key, hasData: true }
+      })
+      .sort((a, b) => a.city.localeCompare(b.city)),
+    [CITY_KEYS]
+  )
 
   // The value shown in the textarea: city name when closed, live query when open
   const displayValue = open ? query : (value?.city ?? '')
@@ -71,63 +74,16 @@ export default function CityPicker({ value, onChange, excludeCity, openOnMount, 
     return () => document.removeEventListener('mousedown', handleMouseDown)
   }, [open, value, onCloseEmpty])
 
-  // Debounced Nominatim geo-lookup — fires 350ms after the user stops typing
+  // Prefix-filter the local city list whenever the query or open state changes
   useEffect(() => {
-    if (query.length < 2) {
-      setResults([])
-      setLoading(false)
-      return
-    }
-
-    setLoading(true)
-    const controller = new AbortController()
-
-    const timer = setTimeout(async () => {
-      try {
-        const url = new URL('https://nominatim.openstreetmap.org/search')
-        url.searchParams.set('q', query)
-        url.searchParams.set('featuretype', 'city')
-        url.searchParams.set('addressdetails', '1')
-        url.searchParams.set('format', 'json')
-        url.searchParams.set('limit', '12')
-        url.searchParams.set('accept-language', 'en')
-        url.searchParams.set('countrycodes', 'us')
-
-        const res  = await fetch(url.toString(), { signal: controller.signal })
-        const data = await res.json()
-
-        const seen   = new Set()
-        const mapped = data
-          .map(item => {
-            const addr = item.address || {}
-            const city = addr.city || addr.town || addr.village || addr.municipality
-            if (!city) return null
-
-            const isoLvl4   = addr['ISO3166-2-lvl4'] || ''
-            const stateCode = isoLvl4.includes('-') ? isoLvl4.split('-')[1].toUpperCase() : null
-            const country   = addr.country_code?.toLowerCase() || 'us'
-            const key       = stateCode ? `${city}|${stateCode}` : `${city}|${country.toUpperCase()}`
-
-            if (seen.has(key)) return null
-            seen.add(key)
-
-            const resolvedKey = NOMINATIM_TO_CALRECYCLE[key] ?? key
-            const hasData     = CITY_KEYS.has(resolvedKey)
-            return { city, state: stateCode, country, key: resolvedKey, hasData }
-          })
-          .filter(Boolean)
-          .filter(r => r.state === 'CA')
-
-        setResults(mapped)
-        setLoading(false)
-        setActiveIdx(-1)
-      } catch (err) {
-        if (err.name !== 'AbortError') setLoading(false)
-      }
-    }, 350)
-
-    return () => { clearTimeout(timer); controller.abort() }
-  }, [query])
+    if (!open) return
+    const q = query.trim().toLowerCase()
+    const filtered = q.length === 0
+      ? cityList
+      : cityList.filter(r => r.city.toLowerCase().startsWith(q))
+    setResults(filtered)
+    setActiveIdx(-1)
+  }, [query, open, cityList])
 
   // Filter out only the other picker's city; keep the currently-selected city so it shows with a checkmark
   const visible = results.filter(r => r.key !== excludeCity?.key)
@@ -137,9 +93,6 @@ export default function CityPicker({ value, onChange, excludeCity, openOnMount, 
     setQuery(initial)
     setActiveIdx(-1)
     setOpen(true)
-    // Kick off a search immediately using the current city name
-    if (initial.length >= 2) setLoading(true)
-    // Don't select all — browser places cursor at the click position naturally
   }
 
   // Handles Tab-key dismissal; mousedown listener handles click-outside
@@ -199,16 +152,12 @@ export default function CityPicker({ value, onChange, excludeCity, openOnMount, 
       {/* Results dropdown */}
       {open && (
         <div className={styles.dropdown} role="listbox">
-          {loading && (
-            <p className={styles.meta}>Searching…</p>
-          )}
-          {!loading && query.length >= 2 && visible.length === 0 && (
+          {visible.length === 0 && (
             <p className={styles.meta}>No cities found</p>
           )}
 
-          {!loading && visible.map((r, i) => {
-            const displayState = r.state || r.country?.toUpperCase()
-            const isSelected   = r.key === value?.key
+          {visible.map((r, i) => {
+            const isSelected = r.key === value?.key
             return (
               <button
                 key={r.key}
@@ -216,17 +165,15 @@ export default function CityPicker({ value, onChange, excludeCity, openOnMount, 
                 aria-selected={isSelected}
                 className={[
                   styles.option,
-                  !r.hasData      ? styles.optionDisabled  : '',
-                  isSelected      ? styles.optionSelected  : '',
-                  i === activeIdx ? styles.optionActive    : '',
+                  isSelected      ? styles.optionSelected : '',
+                  i === activeIdx ? styles.optionActive   : '',
                 ].join(' ')}
-                disabled={!r.hasData}
                 onPointerDown={e => e.preventDefault()}
-                onClick={() => r.hasData && handleSelect(r)}
+                onClick={() => handleSelect(r)}
               >
                 {isSelected && <span className={styles.optionCheck}><CheckIcon /></span>}
                 <span className={styles.optionName}>{r.city}</span>
-                <span className={styles.optionMeta}>{displayState}</span>
+                <span className={styles.optionMeta}>{r.state}</span>
               </button>
             )
           })}
