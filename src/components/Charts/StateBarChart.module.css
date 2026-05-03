@@ -77,23 +77,7 @@
 /* ─── Scrollable chart area ──────────────────────────────── */
 .scrollContainer {
   overflow-x: scroll;
-  /* Extra bottom padding so the scrollbar sits below the bars, not over them */
-  padding-bottom: 8px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--gray-200) transparent;
-}
-
-.scrollContainer::-webkit-scrollbar {
-  height: 4px;
-}
-
-.scrollContainer::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.scrollContainer::-webkit-scrollbar-thumb {
-  background: var(--gray-200);
-  border-radius: 2px;
+  overflow-y: hidden;
 }
 
 .chartInner {
