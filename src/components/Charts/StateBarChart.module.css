@@ -9,7 +9,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-4);
+  flex-wrap: wrap;                    /* narrow phones wrap instead of overflowing */
+  gap: var(--space-2) var(--space-4);
 }
 
 /* ─── Two fixed info rows above the chart ───────────────── */
@@ -108,6 +109,60 @@
   font-size: var(--text-xs);
   color: var(--text-muted);
   font-weight: 500;
+}
+
+/* Tab group + help icon travel together; margin-left: auto keeps them right-aligned
+   when .header wraps them onto their own line. */
+.controlGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-left: auto;
+}
+
+/* ─── Option help (same look as the Material Composition info icon) ─ */
+.infoBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  border: none;
+  background: transparent;
+  color: var(--gray-400);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), background var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.infoBtn:hover {
+  color: var(--gray-700);
+  background: var(--gray-100);
+}
+
+.infoBtnActive {
+  color: var(--gray-700);
+}
+
+.helpPanel {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: var(--space-3);
+  row-gap: var(--space-1);
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.helpTerm {
+  color: var(--text-primary);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.helpDesc {
+  margin: 0;
+  color: var(--text-muted);
 }
 
 /* ─── Chart area (wraps scroll + badges) ─────────────────── */

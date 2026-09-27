@@ -1,4 +1,5 @@
-import { useState, useMemo, useRef, useEffect } from 'react'
+import { useState, useMemo, useRef, useEffect, useId, Fragment } from 'react'
+import { Info } from 'lucide-react'
 import { useAppData } from '../../contexts/DataContext'
 import { useFilter } from '../../contexts/FilterContext'
 import { getPopulation, computePerCapita } from '../../data/cities'
@@ -8,6 +9,38 @@ import styles from './StateBarChart.module.css'
 const STATE_NAMES = { CA: 'California' }
 const AVAILABLE_STATES = ['CA']
 const MIN_VISIBLE = 5
+
+// Plain-language explanations for the two option groups, shown in the help panel.
+// Keep these in sync with getHeightPct / capVal below and computePerCapita in data/cities.js.
+const HELP_TEXT = {
+  mode: [
+    ['Per Capita',   'Pounds of waste sent to disposal per resident per day: the quarter’s tons × 2,000 ÷ 91.25 days ÷ population. Jurisdictions without a population estimate are left out.'],
+    ['Total Volume', 'Total tons sent to disposal in the selected quarter, regardless of population, so large jurisdictions rank highest.'],
+  ],
+  scale: [
+    ['Normal', 'Linear scale. The tallest bar in view fills the chart and every other bar is drawn in proportion, so a few very large values can flatten the rest.'],
+    ['Log',    'Logarithmic scale. Compresses the largest values so smaller jurisdictions stay readable next to the biggest ones.'],
+    ['Capped', 'Linear scale that tops out at the 98th percentile of all jurisdictions. Bars above the cap are drawn at full height with a dark tip, and the cap stays fixed when you zoom.'],
+  ],
+}
+
+/** Small info button that opens the help panel for one option group (same look as the
+ *  "Material Composition" info icon). Only one group's help is open at a time. */
+function HelpToggle({ kind, label, helpOpen, setHelpOpen, controls }) {
+  const isOpen = helpOpen === kind
+  return (
+    <button
+      type="button"
+      className={`${styles.infoBtn} ${isOpen ? styles.infoBtnActive : ''}`}
+      onClick={() => setHelpOpen(isOpen ? null : kind)}
+      aria-expanded={isOpen}
+      aria-controls={controls}
+      aria-label={label}
+    >
+      <Info size={13} />
+    </button>
+  )
+}
 
 function getHeightPct(value, scaleMode, effectiveMax, capVal) {
   if (scaleMode === 'log')
@@ -61,6 +94,8 @@ export default function StateBarChart({
   const [scaleMode, setScaleMode]         = useState('normal')
   const [brushRange, setBrushRange]       = useState(null)
   const [isPanning, setIsPanning]         = useState(false)
+  const [helpOpen, setHelpOpen]           = useState(null) // null | 'mode' | 'scale'
+  const helpId = useId()
 
   const chartAreaRef = useRef(null)
   const zoomStateRef = useRef({ cities: [], validBrush: null })
@@ -253,37 +288,67 @@ export default function StateBarChart({
           ))}
         </select>
 
-        <div className={styles.tabGroup}>
-          <button
-            className={`${styles.tab} ${mode === 'perCapita' ? styles.tabActive : ''}`}
-            onClick={() => { setMode('perCapita'); setBrushRange(null) }}
-          >
-            Per Capita
-          </button>
-          <button
-            className={`${styles.tab} ${mode === 'volume' ? styles.tabActive : ''}`}
-            onClick={() => { setMode('volume'); setBrushRange(null) }}
-          >
-            Total Volume
-          </button>
+        <div className={styles.controlGroup}>
+          <div className={styles.tabGroup}>
+            <button
+              className={`${styles.tab} ${mode === 'perCapita' ? styles.tabActive : ''}`}
+              onClick={() => { setMode('perCapita'); setBrushRange(null) }}
+            >
+              Per Capita
+            </button>
+            <button
+              className={`${styles.tab} ${mode === 'volume' ? styles.tabActive : ''}`}
+              onClick={() => { setMode('volume'); setBrushRange(null) }}
+            >
+              Total Volume
+            </button>
+          </div>
+          <HelpToggle
+            kind="mode"
+            label="About Per Capita and Total Volume"
+            helpOpen={helpOpen}
+            setHelpOpen={setHelpOpen}
+            controls={helpId}
+          />
         </div>
       </div>
 
       {/* Row 2: scale mode toggle */}
       <div className={styles.scaleRow}>
         <span className={styles.scaleLabel}>Scale</span>
-        <div className={styles.tabGroup}>
-          {['normal', 'log', 'capped'].map(s => (
-            <button
-              key={s}
-              className={`${styles.tab} ${scaleMode === s ? styles.tabActive : ''}`}
-              onClick={() => setScaleMode(s)}
-            >
-              {s === 'normal' ? 'Normal' : s === 'log' ? 'Log' : 'Capped'}
-            </button>
-          ))}
+        <div className={styles.controlGroup}>
+          <div className={styles.tabGroup}>
+            {['normal', 'log', 'capped'].map(s => (
+              <button
+                key={s}
+                className={`${styles.tab} ${scaleMode === s ? styles.tabActive : ''}`}
+                onClick={() => setScaleMode(s)}
+              >
+                {s === 'normal' ? 'Normal' : s === 'log' ? 'Log' : 'Capped'}
+              </button>
+            ))}
+          </div>
+          <HelpToggle
+            kind="scale"
+            label="About the scale options"
+            helpOpen={helpOpen}
+            setHelpOpen={setHelpOpen}
+            controls={helpId}
+          />
         </div>
       </div>
+
+      {/* Help panel: one slot shared by both option groups so neither control row moves */}
+      {helpOpen && (
+        <dl id={helpId} className={styles.helpPanel}>
+          {HELP_TEXT[helpOpen].map(([term, desc]) => (
+            <Fragment key={term}>
+              <dt className={styles.helpTerm}>{term}</dt>
+              <dd className={styles.helpDesc}>{desc}</dd>
+            </Fragment>
+          ))}
+        </dl>
+      )}
 
       {/* Row 1 + 2: always-visible selected cities; Row 3: hovered city */}
       <div className={styles.infoSection}>
