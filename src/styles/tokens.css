@@ -66,6 +66,7 @@
   --header-height: 62px;
   --footer-height: 44px;
   --sidebar-width: 256px;
+  --sidebar-collapsed-width: 56px;
   --mobile-sidebar-height: 52px;
 
   /* ── Transitions ───────────────────────────────────────── */

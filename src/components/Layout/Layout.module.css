@@ -12,10 +12,22 @@
   min-height: 0;
   margin-left: var(--sidebar-width);
   overflow-x: clip;
+  transition: margin-left var(--transition-base);
+}
+
+.contentCollapsed {
+  margin-left: var(--sidebar-collapsed-width);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content {
+    transition: none;
+  }
 }
 
 @media (max-width: 768px) {
-  .content {
+  .content,
+  .contentCollapsed {
     margin-left: 0;
     padding-top: var(--mobile-sidebar-height);
   }
