@@ -67,7 +67,38 @@
   color: var(--text-muted);
   font-style: italic;
   line-height: 1.5;
-  margin: var(--space-5) 0 0 0;
+  /* Hug the text (and pull back by the padding) so the flash highlight
+     wraps the sentence instead of a full-width bar */
+  width: fit-content;
+  padding: 2px 6px;
+  margin: var(--space-5) 0 0 -6px;
+  border-radius: var(--radius-sm);
+  outline: none;
+}
+
+.disclaimer sup {
+  font-size: 0.85em;
+  font-style: normal;
+  line-height: 0;
+  position: relative;
+  top: -0.35em;
+  vertical-align: baseline;
+  margin-right: 2px;
+}
+
+/* Brief highlight when reached via the in-page footnote link */
+.disclaimer[data-flash] {
+  animation: footnoteFlash 2.2s ease-out;
+}
+
+@keyframes footnoteFlash {
+  0%, 45% {
+    background: var(--brand-100);
+    color: var(--text-secondary);
+  }
+  100% {
+    background: transparent;
+  }
 }
 
 /* Nyan cat image link */

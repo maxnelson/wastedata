@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUpRightFromSquare } from '@fortawesome/pro-regular-svg-icons'
 import nyanCat from '../../assets/nyan-cat.png'
@@ -14,18 +15,6 @@ export default function Footer() {
       <div className={styles.inner}>
 
         <div className={styles.columns}>
-
-          <div className={styles.col}>
-            <h4 className={styles.colHeading}>Project</h4>
-            <ul className={styles.colList}>
-              <li><a href="/about" className={styles.colLink}>About the Data</a></li>
-              <li>
-                <a href="#donate" className={styles.colLink}>
-                  Buy me a coffee :)
-                </a>
-              </li>
-            </ul>
-          </div>
 
           <div className={styles.col}>
             <h4 className={styles.colHeading}>Data Sources</h4>
@@ -53,6 +42,24 @@ export default function Footer() {
             </ul>
           </div>
 
+          <div className={styles.col}>
+            <h4 className={styles.colHeading}>Project</h4>
+            <ul className={styles.colList}>
+              <li><Link to="/about" className={styles.colLink}>About the Data</Link></li>
+              <li><Link to="/contact-us" className={styles.colLink}>Contact Us</Link></li>
+              <li>
+                <a
+                  href="https://buymeacoffee.com/maxnelson"
+                  className={styles.colLink}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Buy me a coffee :) <ExtIcon />
+                </a>
+              </li>
+            </ul>
+          </div>
+
         </div>
 
         <a
@@ -66,7 +73,10 @@ export default function Footer() {
 
       </div>
 
-      <p className={styles.disclaimer}>Characterization figures are estimates, not direct measurements.</p>
+      {/* Footnote target for the asterisk on the Material Composition heading */}
+      <p id="estimates-note" className={styles.disclaimer} tabIndex={-1}>
+        <sup>*</sup>Material composition percentages are estimates, not direct measurements.
+      </p>
 
       <div className={styles.copyright}>
         <p>© {new Date().getFullYear()} WasteData CA</p>

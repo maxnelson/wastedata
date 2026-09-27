@@ -11,11 +11,74 @@
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 50;
+  transition: width var(--transition-base);
 }
 
+.sidebarCollapsed {
+  width: var(--sidebar-collapsed-width);
+}
+
+/* ─── Collapse toggle ──────────────────────────────────── */
+/* 12px + 32px button + 12px = the collapsed width, so the button
+   stays put when the sidebar changes size */
+.toggleRow {
+  display: flex;
+  padding: var(--space-3) var(--space-3) 0;
+  flex-shrink: 0;
+}
+
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.toggleBtn:hover {
+  color: var(--text-primary);
+  background: var(--gray-200);
+}
+
+.toggleBtn:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* Fixed to the expanded width so the controls never reflow while the
+   sidebar animates; the collapsed sidebar just clips them */
 .inner {
   flex: 1;
+  width: var(--sidebar-width);
   padding: var(--space-4) 0;
+  transition:
+    opacity var(--transition-fast) 100ms,
+    visibility 0s;
+}
+
+/* Fade out, then drop from the tab order and accessibility tree */
+.sidebarCollapsed .inner {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--transition-fast),
+    visibility 0s var(--transition-fast);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .inner,
+  .sidebarCollapsed .inner {
+    transition: none;
+  }
 }
 
 /* ─── Section layout ───────────────────────────────────── */
@@ -106,8 +169,10 @@
 }
 
 /* ─── Mobile: sidebar becomes horizontal toolbar ─────── */
+/* No collapsing here — the toolbar is already compact */
 @media (max-width: 768px) {
-  .sidebar {
+  .sidebar,
+  .sidebarCollapsed {
     top: var(--header-height);
     left: 0;
     right: 0;
@@ -117,15 +182,24 @@
     border-right: none;
     border-bottom: 1px solid var(--border-subtle);
     overflow: visible;
+    transition: none;
   }
 
-  .inner {
+  .toggleRow {
+    display: none;
+  }
+
+  .inner,
+  .sidebarCollapsed .inner {
     display: flex;
     flex-direction: row;
     align-items: center;
+    width: auto;
     padding: 0 var(--space-4);
     gap: var(--space-3);
     flex: 1;
+    opacity: 1;
+    visibility: visible;
   }
 
   .section {

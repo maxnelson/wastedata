@@ -38,6 +38,16 @@ echo "VITE_DATA_BASE_URL=https://maxnelson.github.io/wastedata-ca-data" > .env.l
 npm run dev
 ```
 
+## Deployment
+
+The app is live on **Google App Engine**, project `wastedata-app`. It ships as a static bundle — `app.yaml` uses the `python312` runtime purely as a static file host, serving `dist/` with an SPA fallback to `dist/index.html`. No server code runs.
+
+```bash
+npm run build && gcloud app deploy --quiet --project=wastedata-app
+```
+
+`.gcloudignore` keeps source, `node_modules/`, docs, and config out of the upload — only `dist/` and `app.yaml` are deployed. `gcloud app deploy` stages files into the auto-created `gs://staging.wastedata-app.appspot.com/` bucket using gcloud's built-in storage client, so the deploy has no dependency on `gsutil` (which Google is unbundling from the gcloud CLI in March 2027). Use `gcloud storage`, never `gsutil`, if bucket commands are ever needed.
+
 ## Architecture
 
 ### Routing
@@ -157,5 +167,6 @@ Charts are built with SVG and CSS — no D3 runtime dependency despite the tech-
 - [ ] Download remaining 57 counties (waste characterization)
 - [ ] Acquire CA DOF population data
 - [ ] Build data transformation pipeline for remaining counties
+- [x] Deployed to Google App Engine (`wastedata-app`)
 - [ ] Wire up single-city dashboard route (`/city/:slug`)
-- [ ] Polish and deploy to Firebase Hosting
+- [ ] Polish pass on comparison view

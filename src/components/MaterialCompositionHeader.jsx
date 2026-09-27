@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Info, ChevronDown } from "lucide-react";
+import { Info } from "lucide-react";
 import styles from "./MaterialCompositionHeader.module.css";
 
 const CATEGORIES = [
@@ -13,25 +13,48 @@ const CATEGORIES = [
   { name: "Glass",                 color: "#06b6d4" },
 ];
 
-export default function MaterialCompositionHeader() {
-  const [legendOpen, setLegendOpen]         = useState(false);
-  const [sourceExpanded, setSourceExpanded] = useState(false);
+// Footer footnote (see Footer.jsx) explaining that the donut percentages are estimates
+const FOOTNOTE_ID   = "estimates-note";
+const FOOTNOTE_TEXT = "Material composition percentages are estimates, not direct measurements.";
 
-  function toggleLegend() {
-    setLegendOpen(v => {
-      if (!v) setSourceExpanded(false);
-      return !v;
-    });
-  }
+/** Scroll to the footnote and flash it, instead of a hash jump that would also rewrite the URL. */
+function jumpToFootnote(e) {
+  e.preventDefault();
+  const el = document.getElementById(FOOTNOTE_ID);
+  if (!el) return;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+  el.focus({ preventScroll: true });
+  // Restart the highlight if it is already running
+  el.removeAttribute("data-flash");
+  void el.offsetWidth;
+  el.setAttribute("data-flash", "");
+  el.addEventListener("animationend", () => el.removeAttribute("data-flash"), { once: true });
+}
+
+export default function MaterialCompositionHeader() {
+  const [legendOpen, setLegendOpen] = useState(false);
 
   return (
     <div>
       <div className={`${styles.cardHeader} ${legendOpen ? styles.cardHeaderOpen : ''}`}>
         <div className={styles.cardTitleRow}>
-          <h2 className={styles.cardTitle}>Material Composition</h2>
+          <h2 className={styles.cardTitle}>
+            Material Composition
+            <sup className={styles.footnoteRef}>
+              <a
+                href={`#${FOOTNOTE_ID}`}
+                onClick={jumpToFootnote}
+                title={FOOTNOTE_TEXT}
+                aria-label={`Footnote: ${FOOTNOTE_TEXT}`}
+              >
+                *
+              </a>
+            </sup>
+          </h2>
           <button
             className={`${styles.infoBtn} ${legendOpen ? styles.infoBtnActive : ''}`}
-            onClick={toggleLegend}
+            onClick={() => setLegendOpen(v => !v)}
             aria-expanded={legendOpen}
             aria-label="About this data"
           >
@@ -50,33 +73,20 @@ export default function MaterialCompositionHeader() {
               </div>
             ))}
           </div>
-          <div
-            className={styles.legendSourceWrapper}
-            onClick={() => setSourceExpanded(true)}
-          >
-            <div
-              className={`${styles.legendSource} ${sourceExpanded ? '' : styles.legendSourceCollapsed}`}
+          <p className={styles.legendSource}>
+            These percentages are drawn from CalRecycle's Statewide Waste Characterization
+            Study, which physically sorts and weighs waste samples from jurisdictions across
+            California. Because the study is conducted periodically rather than annually, the
+            material breakdown shown here reflects the most recent study results and remains
+            constant across all years and quarters.{' '}
+            <a
+              href="https://www2.calrecycle.ca.gov/WasteCharacterization/"
+              target="_blank"
+              rel="noreferrer"
             >
-              These percentages are drawn from CalRecycle's Statewide Waste Characterization
-              Study, which physically sorts and weighs waste samples from jurisdictions across
-              California. Because the study is conducted periodically rather than annually, the
-              material breakdown shown here reflects the most recent study results and remains
-              constant across all years and quarters.{' '}
-              <a
-                href="https://www2.calrecycle.ca.gov/WasteCharacterization/"
-                target="_blank"
-                rel="noreferrer"
-                onClick={e => e.stopPropagation()}
-              >
-                Learn more at CalRecycle ↗
-              </a>
-            </div>
-            {!sourceExpanded && (
-              <span className={styles.legendExpandChevron}>
-                <ChevronDown size={11} />
-              </span>
-            )}
-          </div>
+              Learn more at CalRecycle ↗
+            </a>
+          </p>
         </div>
       )}
     </div>

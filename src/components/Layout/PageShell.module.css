@@ -1,0 +1,13 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Sits below the fixed header; page content grows so the footer stays at the bottom */
+.body {
+  flex: 1;
+  padding-top: var(--header-height);
+  display: flex;
+  flex-direction: column;
+}

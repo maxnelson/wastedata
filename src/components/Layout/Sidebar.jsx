@@ -1,3 +1,4 @@
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import styles from './Sidebar.module.css'
 import { useFilter } from '../../contexts/FilterContext'
 import { useAppData } from '../../contexts/DataContext'
@@ -9,7 +10,7 @@ function SectionLabel({ children, style }) {
   return <p className={styles.label} style={style}>{children}</p>
 }
 
-export default function Sidebar() {
+export default function Sidebar({ collapsed = false, onToggle }) {
   const { quartersWithData } = useAppData()
   const { year, quarter, setYear, setQuarter } = useFilter()
 
@@ -26,9 +27,27 @@ export default function Sidebar() {
     }
   }
 
+  const toggleLabel = collapsed ? 'Expand sidebar' : 'Collapse sidebar'
+
   return (
-    <aside className={styles.sidebar}>
-      <div className={styles.inner}>
+    <aside className={`${styles.sidebar} ${collapsed ? styles.sidebarCollapsed : ''}`}>
+
+      {/* Collapse/expand toggle — same spot in both states, hidden on the mobile toolbar */}
+      <div className={styles.toggleRow}>
+        <button
+          type="button"
+          className={styles.toggleBtn}
+          onClick={onToggle}
+          aria-expanded={!collapsed}
+          aria-controls="sidebar-filters"
+          aria-label={toggleLabel}
+          title={toggleLabel}
+        >
+          {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+        </button>
+      </div>
+
+      <div id="sidebar-filters" className={styles.inner}>
 
         {/* ── Time period ──────────────────────────────── */}
         <div className={styles.section}>
