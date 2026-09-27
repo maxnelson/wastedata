@@ -20,8 +20,13 @@ export default function Footer() {
             <ul className={styles.colList}>
               <li><a href="/about" className={styles.colLink}>About the Data</a></li>
               <li>
-                <a href="#donate" className={styles.colLink}>
-                  Buy me a coffee :)
+                <a
+                  href="https://buymeacoffee.com/maxnelson"
+                  className={styles.colLink}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Buy me a coffee :) <ExtIcon />
                 </a>
               </li>
             </ul>
