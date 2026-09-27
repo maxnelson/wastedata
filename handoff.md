@@ -1,8 +1,8 @@
 # Handoff — UI round 2
 
-**Status (2026-09-26):** All three items implemented and verified (desktop Chromium and iOS 26.5 Simulator Safari), one commit each on branch `ui-round-2` (not pushed, not merged). Production build passes. The contact form from the previous batch is confirmed working.
+**Status (2026-09-26):** All three items implemented and verified (desktop Chromium and iOS 26.5 Simulator Safari), merged into `main` (fast-forward, no PR) and pushed. Dependencies were then updated on `main` to clear every open Dependabot alert (`npm audit`: 0 vulnerabilities). Production build passes and the app was smoke-tested on the new Vite and React Router. The contact form from the previous batch is confirmed working. **Working convention from here on: commit directly on `main`; no feature branches or PRs.**
 
-## What shipped (branch `ui-round-2`)
+## What shipped (now on `main`)
 
 1. **City picker works on touch and with Enter** (`1cc5029`, `src/components/CityPicker.jsx`, `CityPicker.module.css`, `App.module.css`).
    - Root cause of the mobile bug: the textarea's blur handler closed the dropdown whenever the blur had no `relatedTarget`. iOS never focuses a tapped `<button>` and keyboard dismissal is a blur too, so the tapped option was unmounted before its `click` arrived. Reproduced in the simulator before the fix (tap "Alameda" → heading reverted to Oakland).
@@ -24,9 +24,10 @@
 - The "dismiss the keyboard, then tap an option" path was not exercised in the simulator; the new blur rule is designed to keep the list open in that case.
 - Optional picker enhancement not done: select the pre-filled name on open so typing replaces it (today the old name has to be deleted first).
 - Dev server note: port 5173 on this Mac is usually another project's Vite server; this app's `vite-dev` launch config uses port 5174.
+- Dependency update (`eb19d49`): react-router-dom 7.14 → 7.18.4, vite 8.0 → 8.3.1, axios 1.15 → 1.20, plus `npm audit fix` for transitive packages. `axios` and `cheerio` are devDependencies used only by the gitignored `tools/` scripts (canonical copies live in `wastedata-ca-data`); they could be removed from this repo's `package.json` to shrink the dependency surface.
 
 ## Next steps
 
-1. Review the branch in the browser (`npm run dev`, or the `vite-dev` launch config on port 5174), especially the help panel copy and the icon choice.
-2. Merge `ui-round-2` into `main`, then deploy: `npm run build && gcloud app deploy --quiet --project=wastedata-app` (build on a machine that has `.env.local` with `VITE_DATA_BASE_URL` and `VITE_FORMSPREE_FORM_ID`).
-3. Optional follow-ups: select-all on picker open; add `.claude` to ESLint's `globalIgnores`; fix the remaining pre-existing lint errors.
+1. Deploy `main`: `npm run build && gcloud app deploy --quiet --project=wastedata-app` (build on a machine that has `.env.local` with `VITE_DATA_BASE_URL` and `VITE_FORMSPREE_FORM_ID`), then check the picker on a real phone.
+2. Confirm the Dependabot page shows no open alerts once GitHub has re-scanned the pushed lockfile (usually within a few minutes).
+3. Optional follow-ups: drop the unused `axios`/`cheerio` devDependencies; select-all on picker open; add `.claude` to ESLint's `globalIgnores`; fix the remaining pre-existing lint errors.
