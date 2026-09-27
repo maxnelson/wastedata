@@ -13,8 +13,14 @@ function CheckIcon() {
 /**
  * CityPicker — inline textarea variant
  *
- * The city name heading is itself a search textarea. Clicking places the cursor
- * and shows dropdown results immediately; typing filters them live.
+ * The city name heading is itself a search textarea. Focusing it shows dropdown
+ * results immediately; typing filters them live.
+ *
+ * Touch notes: the list is deliberately NOT torn down when the textarea blurs
+ * without a new focus target. iOS never focuses a tapped <button>, and dismissing
+ * the on-screen keyboard is a blur too, so closing on those would unmount an
+ * option before its click arrives. Outside taps close the list on pointerup
+ * instead, which also leaves it alone while the page is being scrolled.
  *
  * Props:
  *   value        — { city, state, key } | null
@@ -27,8 +33,7 @@ export default function CityPicker({ value, onChange, excludeCity, openOnMount, 
   const { CITY_KEYS } = useAppData()
   const [open, setOpen]           = useState(false)
   const [query, setQuery]         = useState('')
-  const [results, setResults]     = useState([])
-  const [activeIdx, setActiveIdx] = useState(-1)
+  const [activeIdx, setActiveIdx] = useState(-1) // explicit arrow-key highlight; -1 = none
   const containerRef = useRef(null)
   const inputRef     = useRef(null)
 
@@ -59,76 +64,124 @@ export default function CityPicker({ value, onChange, excludeCity, openOnMount, 
     if (openOnMount) inputRef.current?.focus()
   }, [openOnMount])
 
-  // Close dropdown on outside click; if no value was ever set, collapse City B entirely
-  useEffect(() => {
-    if (!open) return
-    function handleMouseDown(e) {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
-        setOpen(false)
-        setQuery('')
-        setResults([])
-        if (!value) onCloseEmpty?.()
-      }
-    }
-    document.addEventListener('mousedown', handleMouseDown)
-    return () => document.removeEventListener('mousedown', handleMouseDown)
-  }, [open, value, onCloseEmpty])
+  const excludeKey = excludeCity?.key
 
-  // Prefix-filter the local city list whenever the query or open state changes
-  useEffect(() => {
-    if (!open) return
+  // Prefix-filtered results, minus the other picker's city. The currently-selected
+  // city stays in the list so it shows with a checkmark.
+  const visible = useMemo(() => {
+    if (!open) return []
     const q = query.trim().toLowerCase()
-    const filtered = q.length === 0
-      ? cityList
-      : cityList.filter(r => r.city.toLowerCase().startsWith(q))
-    setResults(filtered)
-    setActiveIdx(-1)
-  }, [query, open, cityList])
+    return cityList.filter(r =>
+      r.key !== excludeKey && (q.length === 0 || r.city.toLowerCase().startsWith(q))
+    )
+  }, [open, query, cityList, excludeKey])
 
-  // Filter out only the other picker's city; keep the currently-selected city so it shows with a checkmark
-  const visible = results.filter(r => r.key !== excludeCity?.key)
+  // The row Enter commits: the arrow-key highlight if there is one, otherwise the first
+  // match once the user has typed something. cityList is sorted, so an exact name match
+  // is always the first prefix match.
+  const effectiveIdx = activeIdx >= 0
+    ? Math.min(activeIdx, visible.length - 1)
+    : (query.trim() && visible.length > 0 ? 0 : -1)
 
-  function handleFocus() {
-    const initial = value?.city ?? ''
-    setQuery(initial)
+  function openList() {
+    setQuery(value?.city ?? '')
     setActiveIdx(-1)
     setOpen(true)
   }
 
-  // Handles Tab-key dismissal; mousedown listener handles click-outside
-  function handleBlur(e) {
-    if (containerRef.current?.contains(e.relatedTarget)) return
+  function closeList({ notifyEmpty = true } = {}) {
     setOpen(false)
     setQuery('')
-    setResults([])
-    if (!value) onCloseEmpty?.()
+    setActiveIdx(-1)
+    if (notifyEmpty && !value) onCloseEmpty?.()
+  }
+
+  // Close on an outside click/tap. Mouse and pen close on pointerdown; touch waits for
+  // pointerup so a scroll gesture (which ends in pointercancel) leaves the list open.
+  useEffect(() => {
+    if (!open) return
+    let touchStartedOutside = false
+    const isOutside = target => containerRef.current && !containerRef.current.contains(target)
+    const close = () => {
+      setOpen(false)
+      setQuery('')
+      setActiveIdx(-1)
+      if (!value) onCloseEmpty?.()
+    }
+    function onPointerDown(e) {
+      if (!isOutside(e.target)) return
+      if (e.pointerType === 'touch') touchStartedOutside = true
+      else close()
+    }
+    function onPointerUp() {
+      if (touchStartedOutside) close()
+      touchStartedOutside = false
+    }
+    function onPointerCancel() {
+      touchStartedOutside = false
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('pointerup', onPointerUp)
+    document.addEventListener('pointercancel', onPointerCancel)
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('pointerup', onPointerUp)
+      document.removeEventListener('pointercancel', onPointerCancel)
+    }
+  }, [open, value, onCloseEmpty])
+
+  // Only a real focus move to something outside the picker (Tab / Shift+Tab / another
+  // field) closes here. relatedTarget is null when the on-screen keyboard is dismissed,
+  // when a non-focusable area is tapped, when the window loses focus, or when we call
+  // blur() ourselves — none of those should tear the list down.
+  function handleBlur(e) {
+    if (!e.relatedTarget || containerRef.current?.contains(e.relatedTarget)) return
+    closeList()
   }
 
   function handleSelect(result) {
-    onChange(result)
-    setOpen(false)
-    setQuery('')
-    setResults([])
+    closeList({ notifyEmpty: false })
+    if (result.key !== value?.key) onChange(result)
+    // Drop focus so the mobile keyboard dismisses and the next click/tap re-opens via onFocus
+    inputRef.current?.blur()
+  }
+
+  // First city whose name starts with q (sorted list, so an exact match comes first)
+  function firstMatch(q) {
+    const norm = q.trim().toLowerCase()
+    if (!norm) return null
+    return cityList.find(r => r.key !== excludeKey && r.city.toLowerCase().startsWith(norm)) ?? null
+  }
+
+  function handleChange(e) {
+    const raw = e.target.value
+    if (raw.includes('\n')) {
+      // Some Android keyboards deliver Enter as inserted text (keyCode 229), not a keydown
+      const q = raw.replace(/\n/g, '')
+      const target = firstMatch(q)
+      if (target) handleSelect(target)
+      else setQuery(q)
+      return
+    }
+    if (!open) setOpen(true) // typing after Escape re-opens the list
+    setQuery(raw)
     setActiveIdx(-1)
   }
 
   function handleKeyDown(e) {
     if (e.key === 'Enter') {
-      // Never insert a newline; confirm the highlighted result if any
-      e.preventDefault()
-      const target = visible[activeIdx]
-      if (target?.hasData) handleSelect(target)
+      e.preventDefault()                     // never insert a newline
+      if (e.nativeEvent.isComposing) return  // IME still composing
+      const target = visible[effectiveIdx]
+      if (target) handleSelect(target)
     } else if (e.key === 'ArrowDown') {
       e.preventDefault()
-      setActiveIdx(i => Math.min(i + 1, visible.length - 1))
+      setActiveIdx(Math.min(effectiveIdx + 1, visible.length - 1))
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
-      setActiveIdx(i => Math.max(i - 1, -1))
+      setActiveIdx(Math.max(effectiveIdx - 1, -1))
     } else if (e.key === 'Escape') {
-      setOpen(false)
-      setQuery('')
-      setResults([])
-      if (!value) onCloseEmpty?.()
+      closeList()
     }
   }
 
@@ -143,9 +196,15 @@ export default function CityPicker({ value, onChange, excludeCity, openOnMount, 
         rows={1}
         aria-expanded={open}
         aria-haspopup="listbox"
-        onFocus={handleFocus}
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="words"
+        spellCheck={false}
+        enterKeyHint="go"
+        onFocus={openList}
+        onClick={() => { if (!open) openList() }} // re-open when focus was retained (e.g. after Escape)
         onBlur={handleBlur}
-        onChange={e => { setQuery(e.target.value); setActiveIdx(-1) }}
+        onChange={handleChange}
         onKeyDown={handleKeyDown}
       />
 
@@ -161,14 +220,16 @@ export default function CityPicker({ value, onChange, excludeCity, openOnMount, 
             return (
               <button
                 key={r.key}
+                type="button"
                 role="option"
+                tabIndex={-1}
                 aria-selected={isSelected}
                 className={[
                   styles.option,
-                  isSelected      ? styles.optionSelected : '',
-                  i === activeIdx ? styles.optionActive   : '',
+                  isSelected         ? styles.optionSelected : '',
+                  i === effectiveIdx ? styles.optionActive   : '',
                 ].join(' ')}
-                onPointerDown={e => e.preventDefault()}
+                onMouseDown={e => e.preventDefault()} // keep focus in the textarea; click still fires
                 onClick={() => handleSelect(r)}
               >
                 {isSelected && <span className={styles.optionCheck}><CheckIcon /></span>}

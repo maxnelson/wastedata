@@ -22,7 +22,7 @@
 .panelB {
   flex-shrink: 0;
   width: 0;
-  overflow: hidden; /* clips horizontal spill during width animation */
+  overflow-x: clip; /* clip horizontal spill only — the city dropdown must be free to overflow downward */
   opacity: 0;
   border-left: 1px solid var(--border-subtle);
   transition:

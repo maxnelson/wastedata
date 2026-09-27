@@ -46,6 +46,8 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   overflow-y: auto;
+  touch-action: pan-y;          /* vertical scrolling only inside the list */
+  overscroll-behavior: contain; /* reaching the end does not scroll the page */
   z-index: 200;
 }
 
