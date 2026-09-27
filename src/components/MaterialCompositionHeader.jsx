@@ -13,6 +13,25 @@ const CATEGORIES = [
   { name: "Glass",                 color: "#06b6d4" },
 ];
 
+// Footer footnote (see Footer.jsx) explaining that the donut percentages are estimates
+const FOOTNOTE_ID   = "estimates-note";
+const FOOTNOTE_TEXT = "Material composition percentages are estimates, not direct measurements.";
+
+/** Scroll to the footnote and flash it, instead of a hash jump that would also rewrite the URL. */
+function jumpToFootnote(e) {
+  e.preventDefault();
+  const el = document.getElementById(FOOTNOTE_ID);
+  if (!el) return;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+  el.focus({ preventScroll: true });
+  // Restart the highlight if it is already running
+  el.removeAttribute("data-flash");
+  void el.offsetWidth;
+  el.setAttribute("data-flash", "");
+  el.addEventListener("animationend", () => el.removeAttribute("data-flash"), { once: true });
+}
+
 export default function MaterialCompositionHeader() {
   const [legendOpen, setLegendOpen] = useState(false);
 
@@ -20,7 +39,19 @@ export default function MaterialCompositionHeader() {
     <div>
       <div className={`${styles.cardHeader} ${legendOpen ? styles.cardHeaderOpen : ''}`}>
         <div className={styles.cardTitleRow}>
-          <h2 className={styles.cardTitle}>Material Composition</h2>
+          <h2 className={styles.cardTitle}>
+            Material Composition
+            <sup className={styles.footnoteRef}>
+              <a
+                href={`#${FOOTNOTE_ID}`}
+                onClick={jumpToFootnote}
+                title={FOOTNOTE_TEXT}
+                aria-label={`Footnote: ${FOOTNOTE_TEXT}`}
+              >
+                *
+              </a>
+            </sup>
+          </h2>
           <button
             className={`${styles.infoBtn} ${legendOpen ? styles.infoBtnActive : ''}`}
             onClick={() => setLegendOpen(v => !v)}

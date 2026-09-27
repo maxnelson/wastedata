@@ -71,7 +71,10 @@ export default function Footer() {
 
       </div>
 
-      <p className={styles.disclaimer}>Characterization figures are estimates, not direct measurements.</p>
+      {/* Footnote target for the asterisk on the Material Composition heading */}
+      <p id="estimates-note" className={styles.disclaimer} tabIndex={-1}>
+        <sup>*</sup>Material composition percentages are estimates, not direct measurements.
+      </p>
 
       <div className={styles.copyright}>
         <p>© {new Date().getFullYear()} WasteData CA</p>

@@ -17,6 +17,29 @@
   letter-spacing: -0.2px;
 }
 
+/* Footnote asterisk — raised with position/top and given zero line-height so it
+   never grows the heading's line box (which would knock the info icon off-center) */
+.footnoteRef {
+  font-size: 0.7em;
+  line-height: 0;
+  position: relative;
+  top: -0.4em;
+  vertical-align: baseline;
+  margin-left: 1px;
+}
+
+.footnoteRef a {
+  color: var(--brand-600);
+  text-decoration: none;
+  padding: 0 2px;
+  border-radius: var(--radius-sm);
+}
+
+.footnoteRef a:hover {
+  text-decoration: none;
+  background: var(--brand-50);
+}
+
 .cardTitleRow {
   display: flex;
   align-items: center;
