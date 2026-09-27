@@ -5,6 +5,7 @@ import PageShell from './components/Layout/PageShell'
 import Layout from './components/Layout/Layout'
 import Home from './pages/Home'
 import About from './pages/About'
+import ContactUs from './pages/ContactUs'
 import MaterialCompositionHeader from './components/MaterialCompositionHeader'
 import CityDonutSection from './components/CityDonutSection'
 import StateBarChart from './components/Charts/StateBarChart'
@@ -159,7 +160,8 @@ export default function App() {
       <ScrollToTop />
       <Routes>
         {/* Static pages render immediately, without waiting on the data files */}
-        <Route path="/about" element={<PageShell><About /></PageShell>} />
+        <Route path="/about"      element={<PageShell><About /></PageShell>} />
+        <Route path="/contact-us" element={<PageShell><ContactUs /></PageShell>} />
 
         <Route element={<DataGate />}>
           <Route path="/"                       element={<RandomRedirect />} />

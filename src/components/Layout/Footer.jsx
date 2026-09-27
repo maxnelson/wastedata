@@ -17,23 +17,6 @@ export default function Footer() {
         <div className={styles.columns}>
 
           <div className={styles.col}>
-            <h4 className={styles.colHeading}>Project</h4>
-            <ul className={styles.colList}>
-              <li><Link to="/about" className={styles.colLink}>About the Data</Link></li>
-              <li>
-                <a
-                  href="https://buymeacoffee.com/maxnelson"
-                  className={styles.colLink}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Buy me a coffee :) <ExtIcon />
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div className={styles.col}>
             <h4 className={styles.colHeading}>Data Sources</h4>
             <ul className={styles.colList}>
               <li>
@@ -54,6 +37,24 @@ export default function Footer() {
                   rel="noreferrer"
                 >
                   CA Dept. of Finance <ExtIcon />
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div className={styles.col}>
+            <h4 className={styles.colHeading}>Project</h4>
+            <ul className={styles.colList}>
+              <li><Link to="/about" className={styles.colLink}>About the Data</Link></li>
+              <li><Link to="/contact-us" className={styles.colLink}>Contact Us</Link></li>
+              <li>
+                <a
+                  href="https://buymeacoffee.com/maxnelson"
+                  className={styles.colLink}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Buy me a coffee :) <ExtIcon />
                 </a>
               </li>
             </ul>
