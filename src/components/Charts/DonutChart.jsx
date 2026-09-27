@@ -94,16 +94,21 @@ export default function DonutChart({ categories }) {
     }
   }
 
-  // Pre-compute angular spans, accumulating from 0°
+  // Pre-compute where each segment starts, accumulating from 0°
+  const starts = []
   let cursor = 0
+  for (const cat of categories) {
+    starts.push(cursor)
+    cursor += (cat.pct / 100) * 360
+  }
+
   const segments = categories.map((cat, i) => {
     const span     = (cat.pct / 100) * 360
     const halfGap  = GAP_DEG / 2
-    const startDeg = cursor + halfGap
-    const endDeg   = cursor + span - halfGap
-    cursor += span
+    const startDeg = starts[i] + halfGap
+    const endDeg   = starts[i] + span - halfGap
 
-    const midDeg = cursor - span / 2
+    const midDeg = starts[i] + span / 2
     const midRad = (midDeg - 90) * (Math.PI / 180)
     const dx     = Math.cos(midRad) * EXPLODE
     const dy     = Math.sin(midRad) * EXPLODE

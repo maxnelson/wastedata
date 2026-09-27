@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import DonutChart from "./Charts/DonutChart";
+import { useCharacterization } from "../hooks/useCharacterization";
 
 const CATEGORY_COLORS = {
   Organic:                "#52b788",
@@ -30,17 +30,7 @@ const FALLBACK_CATEGORIES = CATEGORY_ORDER.map(name => ({
 }));
 
 export default function CityDonutSection({ cityData }) {
-  const [charData, setCharData] = useState(null);
-
-  useEffect(() => {
-    if (!cityData?.hasCharacterization) { setCharData(null); return; }
-    const base = import.meta.env.VITE_DATA_BASE_URL;
-    if (!base) { setCharData(null); return; }
-    fetch(`${base}/${cityData.slug}.json`)
-      .then(r => r.ok ? r.json() : null)
-      .then(setCharData)
-      .catch(() => setCharData(null));
-  }, [cityData?.slug, cityData?.hasCharacterization]);
+  const charData = useCharacterization(cityData?.slug, !!cityData?.hasCharacterization);
 
   const charSource = charData?.residential?.categories || charData?.commercial?.categories;
   const categories = charSource

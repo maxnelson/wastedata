@@ -1,7 +1,7 @@
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import styles from './Sidebar.module.css'
-import { useFilter } from '../../contexts/FilterContext'
-import { useAppData } from '../../contexts/DataContext'
+import { useFilter } from '../../contexts/useFilter'
+import { useAppData } from '../../contexts/useAppData'
 
 const YEARS = [2025, 2024, 2023, 2022, 2021, 2020, 2019]
 const QUARTERS = ['Q1', 'Q2', 'Q3', 'Q4']

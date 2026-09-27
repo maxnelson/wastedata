@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/pro-regular-svg-icons";
 import styles from "./Home.module.css";
 import { getDisposalRecord, getPopulation, computePerCapita } from "../data/cities";
-import { useAppData } from "../contexts/DataContext";
-import { useFilter } from "../contexts/FilterContext";
+import { useAppData } from "../contexts/useAppData";
+import { useFilter } from "../contexts/useFilter";
+import { useCharacterization } from "../hooks/useCharacterization";
 import CityPicker from "../components/CityPicker";
 import MaterialCompositionHeader from "../components/MaterialCompositionHeader";
 import DonutChart from "../components/Charts/DonutChart";
@@ -74,17 +74,7 @@ export default function Home({
 
   const data = MOCK_DATA[city] || MOCK_DATA["Berkeley"];
 
-  const [charData, setCharData] = useState(null)
-
-  useEffect(() => {
-    if (!data?.hasCharacterization) { setCharData(null); return }
-    const base = import.meta.env.VITE_DATA_BASE_URL
-    if (!base) { setCharData(null); return }
-    fetch(`${base}/${data.slug}.json`)
-      .then(r => r.ok ? r.json() : null)
-      .then(setCharData)
-      .catch(() => setCharData(null))
-  }, [data?.slug, data?.hasCharacterization])
+  const charData = useCharacterization(data?.slug, !!data?.hasCharacterization)
 
   const disposalRecord = getDisposalRecord(disposalByJurisdiction, city, year, qNum)
   const livePerCapita = computePerCapita(populationData, city, year, disposalRecord)

@@ -1,6 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import styles from './CityPicker.module.css'
-import { useAppData } from '../contexts/DataContext'
+import { useAppData } from '../contexts/useAppData'
 
 function CheckIcon() {
   return (

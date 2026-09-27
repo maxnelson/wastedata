@@ -20,7 +20,7 @@
 
 ## Not done / known
 
-- `npm run lint` still fails on six pre-existing errors: `DonutChart.jsx:104` ref reassign; `CityDonutSection.jsx:36` and `Home.jsx:80` set-state-in-effect; `DataContext.jsx`, `FilterContext.jsx`, `ThemeContext.jsx` only-export-components.
+- `npm run lint` now passes (0 errors). The context hooks live in `src/contexts/useAppData.js`, `useFilter.js`, `useTheme.js` (each also owns its context object); the provider files export only their component. The characterization fetch shared by `Home.jsx` and `CityDonutSection.jsx` moved into `src/hooks/useCharacterization.js`, keyed by slug so a stale response is never shown for another city.
 - The "dismiss the keyboard, then tap an option" path was not exercised in the simulator; the new blur rule is designed to keep the list open in that case.
 - Optional picker enhancement not done: select the pre-filled name on open so typing replaces it (today the old name has to be deleted first).
 - Dev server note: port 5173 on this Mac is usually another project's Vite server; this app's `vite-dev` launch config uses port 5174.
@@ -28,6 +28,6 @@
 
 ## Next steps
 
-1. Check the city picker on a real phone against the deployed site.
-2. Fix the six pre-existing lint errors so `npm run lint` passes (the context-file ones mean moving `useAppData`/`useFilter`/`useTheme` hooks into their own files).
+1. Deploy `main` again to ship the lint refactor: `npm run build && gcloud app deploy --quiet --project=wastedata-app`.
+2. Check the city picker on a real phone against the deployed site.
 3. Optional: select the existing city name when the picker opens so typing replaces it.

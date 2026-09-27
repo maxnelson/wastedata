@@ -1,6 +1,5 @@
-import { createContext, useContext, useState } from 'react'
-
-const FilterContext = createContext(null)
+import { useState } from 'react'
+import { FilterContext } from './useFilter'
 
 export function FilterProvider({ children }) {
   const [year,    setYear]    = useState(2024)
@@ -11,8 +10,4 @@ export function FilterProvider({ children }) {
       {children}
     </FilterContext.Provider>
   )
-}
-
-export function useFilter() {
-  return useContext(FilterContext)
 }

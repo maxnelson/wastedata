@@ -11,7 +11,7 @@ import CityDonutSection from './components/CityDonutSection'
 import StateBarChart from './components/Charts/StateBarChart'
 import { segmentToCityObj, cityObjToSegment, randomCityPair } from './utils/cityUrl'
 import { FilterProvider } from './contexts/FilterContext'
-import { useAppData } from './contexts/DataContext'
+import { useAppData } from './contexts/useAppData'
 import styles from './App.module.css'
 
 /** Renders nothing until the core data files have loaded. Static pages sit outside this gate. */

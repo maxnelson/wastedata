@@ -1,11 +1,10 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { ThemeContext } from './useTheme'
 
 const THEMES = [
   { id: 'analytical', label: 'Analytical', emoji: '📊' },
   { id: 'social',     label: 'Social',     emoji: '📱' },
 ]
-
-const ThemeContext = createContext(null)
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(
@@ -22,10 +21,4 @@ export function ThemeProvider({ children }) {
       {children}
     </ThemeContext.Provider>
   )
-}
-
-export function useTheme() {
-  const ctx = useContext(ThemeContext)
-  if (!ctx) throw new Error('useTheme must be used inside ThemeProvider')
-  return ctx
 }

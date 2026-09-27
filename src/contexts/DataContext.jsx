@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import { DataContext } from './useAppData'
 
-const DataContext = createContext(null)
 const BASE = import.meta.env.VITE_DATA_BASE_URL
 
 export function DataProvider({ children }) {
@@ -36,8 +36,4 @@ export function DataProvider({ children }) {
   }, [])
 
   return <DataContext.Provider value={appData}>{children}</DataContext.Provider>
-}
-
-export function useAppData() {
-  return useContext(DataContext)
 }

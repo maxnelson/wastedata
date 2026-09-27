@@ -1,5 +1,5 @@
 import styles from './SocialLayout.module.css'
-import { useAppData } from '../../contexts/DataContext'
+import { useAppData } from '../../contexts/useAppData'
 
 // Matches the shared --cat-* tokens so donut segments stay consistent
 const CATEGORIES = [
