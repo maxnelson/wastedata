@@ -1,5 +1,7 @@
 import { useState, useMemo, useRef, useEffect, useId, Fragment } from 'react'
 import { Info } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faHand, faComputerMouseScrollwheel } from '@fortawesome/pro-regular-svg-icons'
 import { useAppData } from '../../contexts/DataContext'
 import { useFilter } from '../../contexts/FilterContext'
 import { getPopulation, computePerCapita } from '../../data/cities'
@@ -475,7 +477,19 @@ export default function StateBarChart({
       </div>
 
       <p className={styles.zoomHint}>
-        {validBrush ? 'Drag to pan · Scroll to zoom' : 'Scroll to zoom'}
+        {validBrush && (
+          <>
+            <span className={styles.hintItem}>
+              <FontAwesomeIcon icon={faHand} className={styles.hintIcon} />
+              Drag to pan
+            </span>
+            <span aria-hidden="true">·</span>
+          </>
+        )}
+        <span className={styles.hintItem}>
+          <FontAwesomeIcon icon={faComputerMouseScrollwheel} className={styles.hintIcon} />
+          Scroll to zoom
+        </span>
       </p>
     </div>
   )
