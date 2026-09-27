@@ -74,36 +74,11 @@
   color: var(--text-secondary);
 }
 
-.legendSourceWrapper {
-  position: relative;
-  margin: var(--space-3) 0;
-  cursor: pointer;
-}
-
 .legendSource {
+  margin: var(--space-3) 0;
   font-size: var(--text-xs);
   color: var(--text-muted);
   line-height: 1.6;
-}
-
-.legendSourceCollapsed {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  overflow: hidden;
-}
-
-.legendExpandChevron {
-  position: absolute;
-  bottom: 3px;
-  right: 0;
-  display: flex;
-  align-items: center;
-  padding-left: 24px;
-  color: var(--text-muted);
-  background: linear-gradient(to right, transparent, var(--surface-base) 50%);
-  pointer-events: none;
 }
 
 .legendSource a {

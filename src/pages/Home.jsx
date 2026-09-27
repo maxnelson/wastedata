@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Info, ChevronDown } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/pro-regular-svg-icons";
 import styles from "./Home.module.css";
@@ -7,6 +6,7 @@ import { getDisposalRecord, computePerCapita } from "../data/cities";
 import { useAppData } from "../contexts/DataContext";
 import { useFilter } from "../contexts/FilterContext";
 import CityPicker from "../components/CityPicker";
+import MaterialCompositionHeader from "../components/MaterialCompositionHeader";
 import DonutChart from "../components/Charts/DonutChart";
 import StateBarChart from "../components/Charts/StateBarChart";
 
@@ -74,9 +74,7 @@ export default function Home({
 
   const data = MOCK_DATA[city] || MOCK_DATA["Berkeley"];
 
-  const [legendOpen, setLegendOpen]     = useState(false)
-  const [sourceExpanded, setSourceExpanded] = useState(false)
-  const [charData, setCharData]         = useState(null)
+  const [charData, setCharData] = useState(null)
 
   useEffect(() => {
     if (!data?.hasCharacterization) { setCharData(null); return }
@@ -88,12 +86,6 @@ export default function Home({
       .catch(() => setCharData(null))
   }, [data?.slug, data?.hasCharacterization])
 
-  function toggleLegend() {
-    setLegendOpen(v => {
-      if (!v) setSourceExpanded(false)
-      return !v
-    })
-  }
   const disposalRecord = getDisposalRecord(disposalByJurisdiction, city, year, qNum)
   const livePerCapita = computePerCapita(populationData, city, year, disposalRecord)
   const liveTons = disposalRecord?.total ?? null
@@ -170,62 +162,7 @@ export default function Home({
       {!compareMode && (
         <>
           {/* ── Donut — full content width ──────────────────── */}
-          <div>
-            <div className={`${styles.cardHeader} ${legendOpen ? styles.cardHeaderOpen : ''}`}>
-              <div className={styles.cardTitleRow}>
-                <h2 className={styles.cardTitle}>Material Composition</h2>
-                <button
-                  className={`${styles.infoBtn} ${legendOpen ? styles.infoBtnActive : ''}`}
-                  onClick={toggleLegend}
-                  aria-expanded={legendOpen}
-                  aria-label="About this data"
-                >
-                  <Info size={13} />
-                </button>
-              </div>
-            </div>
-
-            {legendOpen && (
-              <div className={styles.legendPanel}>
-                <div className={styles.legend}>
-                  {CATEGORIES.map(cat => (
-                    <div key={cat.name} className={styles.legendRow}>
-                      <span className={styles.legendSwatch} style={{ background: cat.color }} />
-                      <span className={styles.legendName}>{cat.name}</span>
-                    </div>
-                  ))}
-                </div>
-                <div
-                  className={styles.legendSourceWrapper}
-                  onClick={() => setSourceExpanded(true)}
-                >
-                  <div
-                    className={`${styles.legendSource} ${sourceExpanded ? '' : styles.legendSourceCollapsed}`}
-                  >
-                    These percentages are drawn from CalRecycle's Statewide Waste Characterization
-                    Study, which physically sorts and weighs waste samples from jurisdictions across
-                    California. Because the study is conducted periodically rather than annually, the
-                    material breakdown shown here reflects the most recent study results and remains
-                    constant across all years and quarters.{' '}
-                    <a
-                      href="https://www2.calrecycle.ca.gov/WasteCharacterization/"
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={e => e.stopPropagation()}
-                    >
-                      Learn more at CalRecycle ↗
-                    </a>
-                  </div>
-                  {!sourceExpanded && (
-                    <span className={styles.legendExpandChevron}>
-                      <ChevronDown size={11} />
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
+          <MaterialCompositionHeader />
           <DonutChart categories={CATEGORIES} />
 
           {/* ── State-wide per-capita ranking ───────────────── */}
