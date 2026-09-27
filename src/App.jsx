@@ -1,9 +1,10 @@
-import { Routes, Route, Navigate, useParams, useNavigate } from 'react-router-dom'
+import { useLayoutEffect, useRef } from 'react'
+import { Routes, Route, Navigate, Outlet, useParams, useNavigate, useLocation } from 'react-router-dom'
 import './App.css'
-import AppHeader from './components/Layout/AppHeader'
-import Footer from './components/Layout/Footer'
+import PageShell from './components/Layout/PageShell'
 import Layout from './components/Layout/Layout'
 import Home from './pages/Home'
+import About from './pages/About'
 import MaterialCompositionHeader from './components/MaterialCompositionHeader'
 import CityDonutSection from './components/CityDonutSection'
 import StateBarChart from './components/Charts/StateBarChart'
@@ -11,6 +12,29 @@ import { segmentToCityObj, cityObjToSegment, randomCityPair } from './utils/city
 import { FilterProvider } from './contexts/FilterContext'
 import { useAppData } from './contexts/DataContext'
 import styles from './App.module.css'
+
+/** Renders nothing until the core data files have loaded. Static pages sit outside this gate. */
+function DataGate() {
+  const appData = useAppData()
+  if (!appData) return null
+  return <Outlet />
+}
+
+/**
+ * Scroll to the top when moving between sections of the site (e.g. a footer
+ * link to /about), but not when only the city pair changes inside /compare.
+ */
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  const section = pathname.split('/')[1] ?? ''
+  const prevSection = useRef(section)
+  useLayoutEffect(() => {
+    if (prevSection.current === section) return
+    prevSection.current = section
+    window.scrollTo(0, 0)
+  }, [section])
+  return null
+}
 
 /** Picks two random cities and redirects immediately. */
 function RandomRedirect() {
@@ -67,10 +91,8 @@ function CompareView() {
   }
 
   return (
-    <div className={styles.root}>
-      <AppHeader />
-      <div className={styles.body}>
-        <FilterProvider>
+    <PageShell>
+      <FilterProvider>
         <Layout>
           {/* Row 1: city header + hero (per city) */}
           <div className={`${styles.panels} ${styles.comparing}`}>
@@ -126,22 +148,25 @@ function CompareView() {
             />
           </div>
         </Layout>
-        </FilterProvider>
-      <Footer />
-      </div>
-    </div>
+      </FilterProvider>
+    </PageShell>
   )
 }
 
 export default function App() {
-  const appData = useAppData()
-  if (!appData) return null
-
   return (
-    <Routes>
-      <Route path="/"                       element={<RandomRedirect />} />
-      <Route path="/compare/:slugA/:slugB"  element={<CompareView />} />
-      <Route path="*"                       element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
+        {/* Static pages render immediately, without waiting on the data files */}
+        <Route path="/about" element={<PageShell><About /></PageShell>} />
+
+        <Route element={<DataGate />}>
+          <Route path="/"                       element={<RandomRedirect />} />
+          <Route path="/compare/:slugA/:slugB"  element={<CompareView />} />
+          <Route path="*"                       element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </>
   )
 }

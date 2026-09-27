@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUpRightFromSquare } from '@fortawesome/pro-regular-svg-icons'
 import nyanCat from '../../assets/nyan-cat.png'
@@ -18,7 +19,7 @@ export default function Footer() {
           <div className={styles.col}>
             <h4 className={styles.colHeading}>Project</h4>
             <ul className={styles.colList}>
-              <li><a href="/about" className={styles.colLink}>About the Data</a></li>
+              <li><Link to="/about" className={styles.colLink}>About the Data</Link></li>
               <li>
                 <a
                   href="https://buymeacoffee.com/maxnelson"
