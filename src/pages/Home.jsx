@@ -3,7 +3,7 @@ import { Info, ChevronDown } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/pro-regular-svg-icons";
 import styles from "./Home.module.css";
-import { getDisposalRecord, computePerCapita } from "../data/cities";
+import { getDisposalRecord, getPopulation, computePerCapita } from "../data/cities";
 import { useAppData } from "../contexts/DataContext";
 import { useFilter } from "../contexts/FilterContext";
 import CityPicker from "../components/CityPicker";
@@ -97,8 +97,7 @@ export default function Home({
   const disposalRecord = getDisposalRecord(disposalByJurisdiction, city, year, qNum)
   const livePerCapita = computePerCapita(populationData, city, year, disposalRecord)
   const liveTons = disposalRecord?.total ?? null
-  const popYears = populationData[city]?.pop
-  const livePop = popYears?.[String(year)] ?? popYears?.['2020'] ?? data.pop2024
+  const livePop = getPopulation(populationData, city, year) ?? data.pop2024
 
   // Always show all-streams view (disposed + recycled + diverted)
   const charSource = charData?.residential?.categories || charData?.commercial?.categories;

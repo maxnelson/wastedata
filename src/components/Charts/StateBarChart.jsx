@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { useAppData } from '../../contexts/DataContext'
 import { useFilter } from '../../contexts/FilterContext'
+import { getPopulation, computePerCapita } from '../../data/cities'
 import { getCityColor } from '../../data/cityColorMap'
 import styles from './StateBarChart.module.css'
 
@@ -80,8 +81,8 @@ export default function StateBarChart({
       if (effectiveState !== 'CA') continue
       const record = records.find(r => r.year === year && r.quarter === qNum)
       if (!record || record.total == null) continue
-      const pop      = populationData[name]?.pop?.[String(year)] ?? null
-      const perCapita = pop ? +((record.total * 2000) / 91.25 / pop).toFixed(2) : null
+      const pop       = getPopulation(populationData, name, year)
+      const perCapita = computePerCapita(populationData, name, year, record)
       if (mode === 'perCapita') {
         if (!pop) continue
         entries.push({ name, value: perCapita, total: record.total, pop, perCapita })

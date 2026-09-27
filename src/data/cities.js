@@ -5,14 +5,19 @@ export function getDisposalRecord(disposalByJurisdiction, cityName, year, quarte
   return records.find(r => r.year === year && r.quarter === quarter) ?? null
 }
 
-// Compute per-capita lbs/person/day for a given disposal record + city + year.
+// Returns a city's population for a given year, or null if missing.
 // Falls back to 2020 population when the requested year isn't in the dataset (e.g. 2019).
-// Returns null if data is missing.
-export function computePerCapita(populationData, cityName, year, disposalRecord) {
-  if (!disposalRecord) return null
+export function getPopulation(populationData, cityName, year) {
   const popYears = populationData[cityName]?.pop
   if (!popYears) return null
-  const pop = popYears[String(year)] ?? popYears['2020']
+  return popYears[String(year)] ?? popYears['2020'] ?? null
+}
+
+// Compute per-capita lbs/person/day for a given disposal record + city + year,
+// using getPopulation() for the population. Returns null if data is missing.
+export function computePerCapita(populationData, cityName, year, disposalRecord) {
+  if (!disposalRecord) return null
+  const pop = getPopulation(populationData, cityName, year)
   if (!pop) return null
   // total is in tons; convert to lbs, divide by days in a quarter (~91.25)
   return +((disposalRecord.total * 2000) / 91.25 / pop).toFixed(2)

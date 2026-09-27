@@ -10,9 +10,7 @@ A React web app that visualizes CalRecycle waste disposal data for all ~419 Cali
 
 ```bash
 npm run dev          # Vite dev server (http://localhost:5173)
-npm run build        # Production build → dist/  (requires data/processed/ to exist)
-npm run build:prod   # Download latest data, then build (for CI / fresh clone)
-npm run sync:data    # Download latest core JSON files from wastedata-ca-data GitHub release
+npm run build        # Production build → dist/  (needs VITE_DATA_BASE_URL set — Vite inlines it at build time)
 npm run preview      # Serve the production build locally
 npm run lint         # ESLint
 ```
@@ -24,18 +22,19 @@ npm run lint         # ESLint
 The data pipeline and all processed JSON files live in a separate GitHub repo: `github.com/maxnelson/wastedata-ca-data`.
 
 **How this app gets data:**
-- Three core JSON files (`jurisdictions.json`, `by_jurisdiction.json`, `population.json`) are downloaded from the data repo's GitHub Release (`data-latest` tag) via `npm run sync:data` and bundled by Vite at build time.
-- Per-city characterization data is fetched at runtime from GitHub Pages on the data repo (`VITE_CHAR_BASE_URL` in `.env.local`).
+- All data is fetched at runtime from the data repo's GitHub Pages site (`https://maxnelson.github.io/wastedata-ca-data`) — nothing is bundled into the build. The base URL comes from `VITE_DATA_BASE_URL` in `.env.local` (no trailing slash).
+- The three core JSON files (`core/jurisdictions.json`, `core/disposal/by_jurisdiction.json`, `core/population.json`) are fetched once on app load by `src/contexts/DataContext.jsx` and exposed via `useAppData()` (see Data flow below).
+- Per-city characterization data is fetched on demand from `${VITE_DATA_BASE_URL}/<slug>.json` by `CityDonutSection.jsx` and `Home.jsx`, only for jurisdictions with `hasCharacterization`; otherwise (or if the fetch fails) they fall back to statewide averages.
 
 **Workflow when data changes:**
 1. Run the pipeline in `wastedata-ca-data`: `npm run transform:all`
-2. Commit and push the updated processed JSON — GitHub Actions auto-publishes the release artifact and updates GitHub Pages.
-3. In this repo: `npm run sync:data` to pull the updated core JSONs, then rebuild.
+2. Commit and push the updated processed JSON to `main` — GitHub Actions (`deploy-pages.yml`) republishes the GitHub Pages site. (It also refreshes the `data-latest` release artifact, which this app no longer uses.)
+3. Nothing to do in this repo — no sync or rebuild; the app picks up the new data on the next page load once the Pages deploy finishes. Exception: if `jurisdictions.json` gained new entries, copy over the regenerated city-color files (see City color system).
 
 **Local dev setup after fresh clone:**
 ```bash
 npm install
-npm run sync:data   # downloads data/processed/ from GitHub release
+echo "VITE_DATA_BASE_URL=https://maxnelson.github.io/wastedata-ca-data" > .env.local
 npm run dev
 ```
 
@@ -48,21 +47,30 @@ URL segment format: `"san-francisco-ca"` (slug + state suffix). `src/utils/cityU
 
 ### Data flow
 ```
-data/processed/jurisdictions.json     ← master jurisdiction registry
-data/processed/disposal/by_jurisdiction.json  ← quarterly tonnage per city
-data/processed/population.json        ← annual population estimates
-        ↓
-src/data/cities.js                    ← imports all three, exports MOCK_DATA,
-                                         disposalByJurisdiction, populationData,
-                                         CITY_DATA (keyed "CityName|CA"), helpers
-        ↓
-Home.jsx / StateBarChart.jsx          ← compute derived values (per-capita, totals) on render
+${VITE_DATA_BASE_URL}/core/
+  jurisdictions.json                  ← master jurisdiction registry
+  disposal/by_jurisdiction.json       ← quarterly tonnage per city
+  population.json                     ← annual population estimates
+        ↓  fetched at runtime, once on app load
+src/contexts/DataContext.jsx          ← <DataProvider> (mounted in main.jsx). useAppData() returns
+                                         jurisdictions (alias MOCK_DATA), disposalByJurisdiction,
+                                         populationData, plus derived CITY_DATA (keyed
+                                         "CityName|CA"), CITY_KEYS, quartersWithData
+        ↓  useAppData()
+Home.jsx, StateBarChart.jsx           ← compute per-capita + totals on render, via:
+  └─ src/data/cities.js               ← pure helpers (no data imports; data passed in):
+                                         getPopulation(populationData, …),
+                                         computePerCapita(populationData, …),
+                                         getDisposalRecord(disposalByJurisdiction, …) (Home only)
+App.jsx / CityPicker / Sidebar        ← read jurisdictions, CITY_KEYS, quartersWithData
 ```
 
-Per-capita formula: `(tons × 2000 lbs/ton) / 91.25 days / population` — produces lbs/person/day for a quarter.
+`App.jsx` renders nothing until all three fetches resolve, and `DataContext` has no error handling — if `VITE_DATA_BASE_URL` is unset or a fetch fails, the page stays blank.
+
+Per-capita formula: `(tons × 2000 lbs/ton) / 91.25 days / population` — produces lbs/person/day for a quarter. It lives only in `computePerCapita()`, and population lookups go through `getPopulation()`, which falls back to 2020 population when the selected year has none (e.g. 2019).
 
 ### Global state
-`FilterContext` (year + quarter) is the only shared state. Everything else is local component state or URL-derived.
+`FilterContext` (year + quarter) is the only shared UI state; `DataContext` holds the fetched dataset, read-only once loaded. Everything else is local component state or URL-derived.
 
 ### Styling
 CSS Modules for all components. Design tokens (colors, spacing, typography, shadows, layout dimensions) live in `src/styles/tokens.css` and are referenced as CSS variables everywhere.
